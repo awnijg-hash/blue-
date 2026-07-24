@@ -1,0 +1,822 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>تحدي البومب</title><style>
+  @import url('https://fonts.cdnfonts.com/css/habeba');
+  @import url('https://fonts.googleapis.com/css2?family=Almarai:wght@800&display=swap');
+  * { -webkit-tap-highlight-color: transparent; outline: none; user-select: none; box-sizing: border-box; }
+  
+  body { 
+      margin: 0; 
+      padding: 0; 
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00c6ff 100%) !important; 
+      font-family: 'Habeba', sans-serif; 
+      color: white; 
+      height: 100vh; 
+      overflow: hidden; 
+      display: flex; 
+      flex-direction: column; 
+      position: relative;
+  }
+
+  .bubbles-container {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+  }
+  .bubble {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.05));
+      box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.3), 0 0 15px rgba(0, 198, 255, 0.2);
+      animation: floatBubble 15s infinite linear;
+  }
+  @keyframes floatBubble {
+      0% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -50px) scale(1.05); }
+      66% { transform: translate(-20px, -100px) scale(0.95); }
+      100% { transform: translate(0, -150vh) scale(1); opacity: 0; }
+  }
+
+  .top-frame, .game-frame { margin: 0 !important; padding: 0 !important; border: none !important; background: transparent !important; z-index: 10; display: flex; justify-content: center; width: 100%; }
+  
+  .top-bar { 
+      height: auto; 
+      background: transparent !important; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: flex-start; 
+      padding: 2px 0 0 0; 
+      gap: 2px; 
+      position: relative; 
+      width: 100%;
+      max-width: 50vh;
+  }
+
+  .game-frame { flex: 1; align-items: flex-start; }
+
+  .mini-balls-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 3px;
+      margin-bottom: 0px;
+      z-index: 25;
+      width: 100%;
+      flex-wrap: wrap;
+  }
+  .mini-ball {
+      width: 2vh;
+      height: 2vh;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9vh;
+      font-weight: 900;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.4), inset 0 -2px 3px rgba(0, 0, 0, 0.7);
+      transition: transform 0.3s, opacity 0.3s, width 0.3s;
+  }
+  .mini-ball.hidden-item {
+      transform: scale(0);
+      opacity: 0;
+      width: 0;
+      margin: 0;
+      overflow: hidden;
+  }
+  .mini-bomb {
+      background: radial-gradient(circle at 35% 35%, #ff4d4d 0%, #cc0000 50%, #660000 100%);
+      color: #fff;
+  }
+  .mini-silver {
+      background: radial-gradient(circle at 30% 30%, #ffffff 0%, #e0e0e0 35%, #9e9e9e 70%, #424242 100%);
+      box-shadow: inset 0 2px 4px rgba(255,255,255,0.9), inset 0 -3px 6px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.4);
+  }
+  .mini-gold {
+      background: radial-gradient(circle at 30% 30%, #fff9c4 0%, #ffee58 35%, #fbc02d 70%, #e65100 100%);
+      box-shadow: inset 0 2px 4px rgba(255,255,255,0.9), inset 0 -3px 6px rgba(100,50,0,0.8), 0 2px 4px rgba(0,0,0,0.4);
+  }
+
+  .control-balls-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      margin-bottom: 0px;
+      position: relative;
+      z-index: 20;
+  }
+  .ctrl-ball {
+      width: 4.5vh;
+      height: 4.5vh;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(0, 0, 0, 0.6) 100%), rgba(20, 40, 80, 0.8);
+      border: none !important;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.4), inset 0 -3px 6px rgba(0, 0, 0, 0.7);
+      transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .ctrl-ball:active { transform: scale(0.95); }
+
+  .temp-sum-box {
+      position: absolute;
+      right: 2px; 
+      top: 0; 
+      height: 11vh; 
+      width: calc((40vh - 18px) / 4); 
+      background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(0, 0, 0, 0.8) 100%), rgba(15, 30, 60, 0.95);
+      border-radius: 18px !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.4), inset 0 -3px 6px rgba(0, 0, 0, 0.8);
+      z-index: 30;
+      pointer-events: none;
+  }
+  .temp-sum-text {
+      color: #ff00ea; 
+      font-size: 5.5vh; 
+      font-weight: 900;
+      text-shadow: 0 3px 6px rgba(0, 0, 0, 0.9);
+      text-align: center;
+  }
+  
+  .modal { 
+      position: fixed; 
+      inset: 0; 
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00c6ff 100%); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      z-index: 9999; 
+      padding: 10px; 
+      overflow-y: auto;
+  }
+  .settings-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      max-width: 400px;
+      padding: 10px 0;
+      max-height: 90vh;
+      overflow-y: auto;
+  }
+  
+  .ball-option {
+      width: 90%;
+      max-width: 350px;
+      height: 55px;
+      border-radius: 12px;
+      background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(0, 0, 0, 0.7) 100%), rgba(20, 40, 80, 0.9);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.3), inset 0 -3px 6px rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s;
+  }
+  .ball-option:active { transform: scale(0.98); }
+  
+  .ball-option select, .ball-option input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      border-radius: 12px;
+  }
+
+  .ball-option.team-input-ball {
+      opacity: 1 !important;
+      cursor: text;
+  }
+  .ball-option.team-input-ball input {
+      opacity: 1 !important;
+      cursor: text;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-family: 'Habeba', sans-serif;
+      font-size: 2.4vh;
+      text-align: center;
+      direction: rtl;
+      font-weight: 900;
+      outline: none;
+      padding: 0;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 90%;
+      height: 100%;
+  }
+  
+  .ball-display-text {
+      font-size: 2.8vh;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+      pointer-events: none;
+  }
+
+  .start-ball {
+      background: radial-gradient(circle at 35% 35%, rgba(100, 255, 100, 0.6) 0%, rgba(0, 150, 0, 0.3) 50%, rgba(0, 50, 0, 0.9) 100%), rgba(10, 60, 20, 0.9);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.4), inset 0 -3px 6px rgba(0, 0, 0, 0.8);
+      width: 90%;
+      max-width: 350px;
+      height: 55px;
+      border-radius: 12px;
+  }
+
+  #dynamicTeamInputs {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      align-items: center;
+  }
+
+  .teams-row { 
+      display: flex; 
+      gap: 6px; 
+      justify-content: flex-end; 
+      align-items: center;
+      width: 100%; 
+      max-width: 40vh; 
+      margin-top: 0px; 
+      margin-right: calc((40vh - 18px) / 4 + 6px); 
+      flex-wrap: nowrap; 
+  }
+  .team-box { 
+      flex: 1;
+      height: 11vh; 
+      min-width: 0; 
+      border-radius: 50% !important; 
+      border: none !important; 
+      background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(0, 0, 0, 0.7) 100%), rgba(15, 30, 60, 0.9); 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center; 
+      padding: 2px; 
+      transition: 0.3s; 
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.4), inset 0 -3px 6px rgba(0, 0, 0, 0.8);
+      position: relative;
+  }
+  .team-box.active { 
+      border: none !important;
+      box-shadow: 0 0 18px #ccff00, inset 0 0 10px #ccff00, 0 5px 10px rgba(0, 0, 0, 0.5); 
+      background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.4) 0%, rgba(20, 60, 20, 0.3) 50%, rgba(5, 20, 5, 0.9) 100%), rgba(10, 40, 10, 0.9); 
+      transform: scale(1.03); 
+  }
+  
+  .t-name { background: transparent; border: none; color: #00f2ff; text-align: center; width: 100%; font-weight: 900; font-size: 2.1vh; text-shadow: 0 1px 2px rgba(0,0,0,0.8); outline: none; overflow: hidden; text-overflow: ellipsis; }
+  .t-score { background: transparent; border: none; color: white; text-align: center; width: 100%; font-weight: 900; font-size: 3.4vh; text-shadow: 0 2px 4px rgba(0,0,0,0.9); outline: none; }
+  
+  .game-area { height: 100%; width: 100%; display: flex; justify-content: center; align-items: flex-start; padding: 0; }
+  
+  .grid-container { 
+      display: grid; 
+      gap: 6px; 
+      width: 100%; 
+      max-width: 50vh; 
+      max-height: 50vh; 
+      padding: 2px 5px; 
+      grid-template-columns: repeat(5, 1fr); 
+      grid-auto-rows: 1fr; 
+      margin-top: 0 !important;
+  }
+  
+  .square { 
+      background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(0, 0, 0, 0.6) 100%), rgba(20, 40, 80, 0.5); 
+      border-radius: 50% !important; 
+      border: none !important; 
+      position: relative; 
+      cursor: pointer; 
+      transform-style: preserve-3d; 
+      transition: transform 0.6s, background 0.3s; 
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.4), inset 0 -3px 6px rgba(0, 0, 0, 0.7); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      aspect-ratio: 1 / 1;
+  }
+  .outer-num { color: #ffffff; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9); font-size: 3.2vh; font-weight: 900; z-index: 2; }
+  
+  /* تم تكبير حجم الخط داخل كرات الأرقام لتسهيل الرؤية لضعاف النصر */
+  .inner-face { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 4.5vh; font-weight: 900; transform: rotateY(180deg); backface-visibility: hidden; border-radius: 50% !important; border: none !important; box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), inset 0 -3px 6px rgba(0, 0, 0, 0.7); }
+  
+  .square.open .outer-num { display: none; }
+  .square.open { transform: rotateY(180deg); }
+  
+  .bg-silver { 
+      background: radial-gradient(circle at 30% 30%, #ffffff 0%, #e0e0e0 35%, #9e9e9e 70%, #424242 100%) !important; 
+      color: #000 !important; 
+      box-shadow: inset 0 3px 6px rgba(255,255,255,0.9), inset 0 -4px 8px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.5) !important;
+  }
+  .bg-gold { 
+      background: radial-gradient(circle at 30% 30%, #fff9c4 0%, #ffee58 35%, #fbc02d 70%, #e65100 100%) !important; 
+      color: #000 !important; 
+      box-shadow: inset 0 3px 6px rgba(255,255,255,0.9), inset 0 -4px 8px rgba(100,50,0,0.8), 0 5px 10px rgba(0,0,0,0.5) !important;
+  }
+  .bg-red { background: radial-gradient(circle at 35% 35%, #ff4d4d 0%, #cc0000 50%, #660000 100%) !important; color: #fff !important; } 
+  .bg-green { background: radial-gradient(circle at 35% 35%, #4dff4d 0%, #00b300 50%, #004d00 100%) !important; color: #fff !important; } 
+  .bg-blue { background: radial-gradient(circle at 35% 35%, #4da6ff 0%, #0066cc 100%, #00264d 100%) !important; color: #fff !important; } 
+  .bg-yellow { background: radial-gradient(circle at 35% 35%, #ffd700 0%, #ff8c00 50%, #b8860b 100%) !important; color: #fff !important; } 
+  .bg-purple { background: radial-gradient(circle at 35% 35%, #b366ff 0%, #6600cc 50%, #330066 100%) !important; color: #fff !important; }
+  
+  .square.shatter { animation: shatterAnim 0.8s forwards; pointer-events: none; }
+  @keyframes shatterAnim { 0% { transform: rotateY(180deg) scale(1); opacity: 1; } 100% { transform: rotateY(180deg) scale(0) rotate(20deg); opacity: 0; } }
+  .shake { animation: shakeAnim 0.8s both; }
+  @keyframes shakeAnim { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, 0, 0); } }</style></head><body onclick="initAudio(); tryFS();"><div class="bubbles-container" id="bubblesContainer"></div><datalist id="namesList"></datalist><!-- نافذة الإعدادات --><div class="modal" id="settingsModal" style="display:flex;">
+  <div class="settings-column">
+    <div class="ball-option">
+      <span class="ball-display-text" id="teamCountDisplay">2</span>
+      <select id="teamCountSel" onchange="onTeamCountChange()">
+        <option value="2" selected>2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+    </div>
+    <div id="dynamicTeamInputs"></div>
+    <div class="ball-option">
+      <span class="ball-display-text" id="gridSizeDisplay">40</span>
+      <select id="gridSizeSel" onchange="onGridSizeChange()">
+        <option value="25">25</option>
+        <option value="40" selected>40</option> 
+        <option value="50">50</option>
+      </select>
+    </div>
+    <div class="ball-option">
+      <span class="ball-display-text" id="bombCountDisplay">2</span>
+      <select id="bombCountSel" onchange="onBombCountChange()">
+        <option value="1">1</option>
+        <option value="2" selected>2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      </select>
+    </div>
+    <div class="ball-option start-ball" onclick="startNewGame()" title="ابدأ"></div>
+  </div></div><div class="top-frame" id="p1">
+  <div class="top-bar">
+    <div class="mini-balls-row" id="miniBallsRow"></div>
+    <div class="control-balls-row">
+        <!-- إزالة الأشكال الداخلية لكرة الإعدادات والتراجع والسحب لتصبح مفرغة تماماً -->
+        <div class="ctrl-ball" onclick="openSettings()" title="الإعدادات"></div>
+        <div class="ctrl-ball" onclick="undoSquare()" title="تراجع"></div>
+        <div class="ctrl-ball" onclick="nextTurn()" title="سحب"></div>
+        <div class="temp-sum-box"><span class="temp-sum-text" id="currentSum">0</span></div>
+    </div>
+    <div class="teams-row" id="teamsList"></div>
+  </div></div><div class="game-frame" id="p2">
+  <div class="game-area"><div class="grid-container" id="gameGrid"></div></div></div><script>
+    function createBubbles() {
+        const container = document.getElementById('bubblesContainer');
+        if (!container) return;
+        for (let i = 0; i < 20; i++) {
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            const size = Math.random() * 60 + 20;
+            bubble.style.width = `${size}px`;
+            bubble.style.height = `${size}px`;
+            bubble.style.left = `${Math.random() * 100}%`;
+            bubble.style.top = `${Math.random() * 100 + 100}%`;
+            bubble.style.animationDuration = `${Math.random() * 10 + 10}s`;
+            bubble.style.animationDelay = `${Math.random() * 5}s`;
+            container.appendChild(bubble);
+        }
+    }
+    window.addEventListener('DOMContentLoaded', () => {
+        createBubbles();
+        generateInputs();
+        onGridSizeChange();
+    });
+
+   const goldenPack40 = [
+    {t: 'n', v: 9, c: 'bg-red'}, {t: 'n', v: 9, c: 'bg-green'}, {t: 'n', v: 9, c: 'bg-purple'},
+    {t: 'n', v: 8, c: 'bg-blue'}, {t: 'n', v: 8, c: 'bg-yellow'}, {t: 'n', v: 8, c: 'bg-red'},
+    {t: 'n', v: 7, c: 'bg-green'}, {t: 'n', v: 7, c: 'bg-purple'}, {t: 'n', v: 7, c: 'bg-blue'},
+    {t: 'n', v: 6, c: 'bg-yellow'}, {t: 'n', v: 6, c: 'bg-red'}, {t: 'n', v: 6, c: 'bg-green'},
+    {t: 'n', v: 5, c: 'bg-blue'}, {t: 'n', v: 5, c: 'bg-purple'}, {t: 'n', v: 5, c: 'bg-yellow'},
+    {t: 'n', v: 4, c: 'bg-red'}, {t: 'n', v: 4, c: 'bg-green'}, {t: 'n', v: 4, c: 'bg-blue'},
+    {t: 'n', v: 3, c: 'bg-red'}, {t: 'n', v: 3, c: 'bg-green'}, {t: 'n', v: 3, c: 'bg-purple'},
+    {t: 'n', v: 2, c: 'bg-blue'}, {t: 'n', v: 2, c: 'bg-yellow'},
+    {t: 'n', v: 1, c: 'bg-red'}, {t: 'n', v: 1, c: 'bg-green'}, {t: 'n', v: 1, c: 'bg-blue'},
+    {t: 'n', v: 6, c: 'bg-blue'}, {t: 'n', v: 5, c: 'bg-red'}, {t: 'n', v: 4, c: 'bg-yellow'},
+    {t: 'n', v: 6, c: 'bg-purple'}, {t: 'n', v: 5, c: 'bg-green'}, {t: 'n', v: 4, c: 'bg-purple'},
+    {t: 'n', v: 9, c: 'bg-yellow'}
+];
+  let currentTurnHistory = [];  
+  let lastTurnScore = 0;  
+  let gameHistory = [];  
+  let openedCount = 0; 
+  let teams = [], currentTeamIdx = 0, turnPicks = [], isProcessing = false, audioCtx, ballsCount = 2;
+
+  function onTeamCountChange() {
+    const val = document.getElementById('teamCountSel').value;
+    document.getElementById('teamCountDisplay').innerText = val;
+    generateInputs();
+  }
+
+  function onGridSizeChange() {
+    const sel = document.getElementById('gridSizeSel');
+    const size = parseInt(sel.value) || 40;
+    document.getElementById('gridSizeDisplay').innerText = size;
+    const bombSel = document.getElementById('bombCountSel');
+    if (size === 25) bombSel.value = "1";
+    else if (size === 40) bombSel.value = "2";
+    else if (size === 50) bombSel.value = "3";
+    document.getElementById('bombCountDisplay').innerText = bombSel.value;
+    updateMiniBallsDisplay();
+  }
+
+  function onBombCountChange() {
+    const val = document.getElementById('bombCountSel').value;
+    document.getElementById('bombCountDisplay').innerText = val;
+    updateMiniBallsDisplay();
+  }
+
+  function updateMiniBallsDisplay() {
+    const size = parseInt(document.getElementById('gridSizeSel')?.value) || 40;
+    const bCountSel = document.getElementById('bombCountSel');
+    const row = document.getElementById('miniBallsRow');
+    if (!row) return;
+    
+    let html = '';
+    if (size === 25) {
+        html += `<div class="mini-ball mini-bomb" data-type="b" data-val="0">💣</div>`;
+        html += `<div class="mini-ball mini-silver" data-type="x" data-val="2"></div>`;
+        html += `<div class="mini-ball mini-gold" data-type="x" data-val="3"></div>`;
+    } else {
+        const currentBombs = bCountSel ? parseInt(bCountSel.value) || 2 : 2;
+        for(let i = 0; i < currentBombs; i++) {
+            html += `<div class="mini-ball mini-bomb" data-type="b" data-val="0">💣</div>`;
+        }
+        for(let i = 0; i < 3; i++) {
+            html += `<div class="mini-ball mini-silver" data-type="x" data-val="2"></div>`;
+        }
+        for(let i = 0; i < 2; i++) {
+            html += `<div class="mini-ball mini-gold" data-type="x" data-val="3"></div>`;
+        }
+    }
+    row.innerHTML = html;
+  }
+
+  function hideMatchingMiniBall(type, val) {
+    const row = document.getElementById('miniBallsRow');
+    if (!row) return;
+    const target = Array.from(row.querySelectorAll('.mini-ball:not(.hidden-item)')).find(el => {
+        return el.getAttribute('data-type') === type && parseInt(el.getAttribute('data-val')) === val;
+    });
+    if (target) target.classList.add('hidden-item');
+  }
+
+  function restoreMatchingMiniBall(type, val) {
+    const row = document.getElementById('miniBallsRow');
+    if (!row) return;
+    const target = Array.from(row.querySelectorAll('.mini-ball.hidden-item')).reverse().find(el => {
+        return el.getAttribute('data-type') === type && parseInt(el.getAttribute('data-val')) === val;
+    });
+    if (target) target.classList.remove('hidden-item');
+  }
+
+  function saveNamesToStorage() {
+    const names = teams.map(t => t.name);
+    let savedNames = JSON.parse(localStorage.getItem('savedNames') || '[]');
+    names.forEach(name => { if (!savedNames.includes(name)) savedNames.push(name); });
+    localStorage.setItem('savedNames', JSON.stringify(savedNames));
+    updateDataList();
+  }
+
+  function undoSquare() {
+    if (currentTurnHistory.length === 0) return;
+    let lastMove = currentTurnHistory.pop();
+    let sq = document.getElementById(lastMove.id);
+    if (sq) {
+        sq.classList.remove('open', 'shatter');
+        sq.style.opacity = '1';
+    }
+    if (lastMove.data.t === 'b' || lastMove.data.t === 'x') {
+        restoreMatchingMiniBall(lastMove.data.t, lastMove.data.v);
+    }
+    teams[lastMove.teamIdx].score = lastMove.scoreBefore;
+    currentTeamIdx = lastMove.teamIdx;
+    if (turnPicks.length > 0) turnPicks.pop();
+    updateSum();
+    renderTeams();
+  }
+
+  function updateDataList() {
+    const savedNames = JSON.parse(localStorage.getItem('savedNames') || '[]');
+    const list = document.getElementById('namesList');
+    if(list) list.innerHTML = savedNames.map(n => `<option value="${n}">`).join('');
+  }
+  window.onload = updateDataList;
+
+  function updateSum() { 
+    let total = 0; 
+    turnPicks.forEach((p) => { 
+        if (p.t === 'n') total += p.v; 
+        else if (p.t === 'x') { if (total > 0) total *= p.v; }
+    }); 
+    const sumDisplay = document.getElementById('currentSum');
+    if (sumDisplay) sumDisplay.innerText = total;
+  }
+
+  function generateInputs() {
+    const count = document.getElementById('teamCountSel').value;
+    const area = document.getElementById('dynamicTeamInputs');
+    area.innerHTML = ''; 
+    for(let i = 1; i <= count; i++) {
+        let ballDiv = document.createElement('div');
+        ballDiv.className = 'ball-option team-input-ball';
+        
+        let input = document.createElement('input');
+        input.type = 'text';
+        input.id = `t${i}`;
+        input.value = `فريق ${i}`;
+        input.setAttribute('list', 'namesList');
+        input.onclick = function(e) { e.stopPropagation(); this.select(); };
+        
+        ballDiv.appendChild(input);
+        area.appendChild(ballDiv);
+    }
+  }
+
+  function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+  function tryFS() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{}); }
+
+  function startNewGame() {
+    const grid = document.getElementById('gameGrid');
+    grid.innerHTML = ''; 
+    grid.style.display = 'none'; 
+    grid.offsetHeight; 
+    grid.style.display = 'grid'; 
+
+    currentTurnHistory = [];
+    turnPicks = [];
+    isProcessing = false;
+    currentTeamIdx = 0; 
+    ballsCount = parseInt(document.getElementById('bombCountSel').value) || 2;
+    updateMiniBallsDisplay();
+
+    const names = []; 
+    let teamCount = document.getElementById('teamCountSel').value || 2;
+    for(let i=1; i<=teamCount; i++) {
+        let val = document.getElementById(`t${i}`) ? document.getElementById(`t${i}`).value : "";
+        names.push(val || `فريق ${i}`); 
+    }
+    teams = names.map((name, i) => ({id: i, score: 0, name: name})); 
+
+    setupGrid(parseInt(document.getElementById('gridSizeSel').value) || 40, ballsCount); 
+
+    document.getElementById('settingsModal').style.display = 'none'; 
+    saveNamesToStorage();
+    renderTeams(); 
+    updateSum();
+  }
+
+  function renderTeams() { 
+    const container = document.getElementById('teamsList'); 
+    container.innerHTML = teams.map((t, i) => `
+    <div class="team-box ${i === currentTeamIdx ? 'active' : ''}" id="box-${i}">
+        <input class="t-name" value="${t.name}" onchange="teams[${i}].name = this.value">
+        <input class="t-score" value="${t.score}" onchange="teams[${i}].score = parseInt(this.value)">
+    </div>`).join(''); 
+  }
+
+  function setupGrid(total, bombs) {
+    const grid = document.getElementById('gameGrid');
+    grid.innerHTML = '';
+    grid.style.display = 'none'; 
+    grid.offsetHeight; 
+    grid.style.display = 'grid'; 
+
+    isProcessing = false; 
+    turnPicks = []; 
+    currentTurnHistory = [];
+    
+    const cols = 5; 
+    const rows = total / cols; 
+    let gridMatrix = Array(rows).fill().map(() => Array(cols).fill(null));
+    const colors = ['bg-red', 'bg-green', 'bg-blue', 'bg-yellow', 'bg-purple'];
+
+    let midR = Math.floor(rows / 2);
+    let midC = Math.floor(cols / 2);
+    let sectors = [
+        { rMin: 0, rMax: midR, cMin: 0, cMax: midC },     
+        { rMin: 0, rMax: midR, cMin: midC, cMax: cols },      
+        { rMin: midR, rMax: rows, cMin: 0, cMax: midC },      
+        { rMin: midR, rMax: rows, cMin: midC, cMax: cols }    
+    ];
+
+    let specialItems = [];
+    let bombQty = bombs; 
+    for(let i = 0; i < bombQty; i++) specialItems.push({t: 'b', v: 0, c: 'bg-red'});
+    for(let i = 0; i < 3; i++) specialItems.push({t: 'x', v: 2, c: 'bg-silver'});
+    for(let i = 0; i < 2; i++) specialItems.push({t: 'x', v: 3, c: 'bg-gold'});
+
+    shuffleArray(specialItems);
+
+    specialItems.forEach((item, itemIdx) => {
+        let bestR = -1, bestC = -1;
+        let maxMinDist = -1;
+        let targetSec = sectors[itemIdx % sectors.length]; 
+
+        let candidateSlots = [];
+        for (let r = targetSec.rMin; r < targetSec.rMax; r++) {
+            for (let c = targetSec.cMin; c < targetSec.cMax; c++) {
+                if (gridMatrix[r][c] === null) candidateSlots.push({r, c});
+            }
+        }
+        
+        if (candidateSlots.length === 0) {
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    if (gridMatrix[r][c] === null) candidateSlots.push({r, c});
+                }
+            }
+        }
+
+        shuffleArray(candidateSlots);
+
+        candidateSlots.forEach(slot => {
+            let minDistToOther = Infinity;
+            for (let pr = 0; pr < rows; pr++) {
+                for (let pc = 0; pc < cols; pc++) {
+                    if (gridMatrix[pr][pc] && (gridMatrix[pr][pc].c === 'bg-silver' || gridMatrix[pr][pc].c === 'bg-gold')) {
+                        let dist = Math.abs(slot.r - pr) + Math.abs(slot.c - pc);
+                        if (dist < minDistToOther) minDistToOther = dist;
+                    }
+                }
+            }
+            if (minDistToOther > maxMinDist) {
+                maxMinDist = minDistToOther;
+                bestR = slot.r;
+                bestC = slot.c;
+            }
+        });
+
+        if (bestR !== -1 && bestC !== -1) gridMatrix[bestR][bestC] = item;
+    });
+
+    let standardPool = [];
+    if (total == 40) {
+        standardPool = [...goldenPack40];
+    } else {
+        for (let v = 1; v <= 9; v++) {
+            colors.forEach(c => standardPool.push({t: 'n', v: v, c: c}));
+        }
+    }
+    
+    shuffleArray(standardPool);
+
+    let emptyCoords = [];
+    for(let r = 0; r < rows; r++) {
+        for(let c = 0; c < cols; c++) {
+            if(gridMatrix[r][c] === null) emptyCoords.push({r, c});
+        }
+    }
+
+    let balancedNumbers = [];
+    while(balancedNumbers.length < emptyCoords.length) {
+        let temp = [...standardPool];
+        shuffleArray(temp);
+        balancedNumbers = balancedNumbers.concat(temp);
+    }
+    balancedNumbers = balancedNumbers.slice(0, emptyCoords.length);
+    shuffleArray(balancedNumbers);
+
+    emptyCoords.forEach(coord => {
+        let r = coord.r;
+        let c = coord.c;
+        let chosenItem = null;
+        let bestIndex = 0;
+        let minPenalty = Infinity;
+        
+        for (let i = 0; i < balancedNumbers.length; i++) {
+            let candidate = balancedNumbers[i];
+            let penalty = 0;
+            
+            for (let dr = -2; dr <= 2; dr++) {
+                for (let dc = -2; dc <= 2; dc++) {
+                    if (dr === 0 && dc === 0) continue;
+                    let nr = r + dr;
+                    let nc = c + dc;
+                    if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+                        let neighbor = gridMatrix[nr][nc];
+                        if (neighbor && neighbor.t === 'n') {
+                            if (neighbor.v === candidate.v) penalty += (3 - Math.max(Math.abs(dr), Math.abs(dc)));
+                            if (neighbor.c === candidate.c) penalty += (2 - Math.max(Math.abs(dr), Math.abs(dc)));
+                        }
+                    }
+                }
+            }
+
+            if (penalty < minPenalty) {
+                minPenalty = penalty;
+                bestIndex = i;
+                if (penalty === 0) break;
+            }
+        }
+
+        chosenItem = balancedNumbers.splice(bestIndex, 1)[0];
+        gridMatrix[r][c] = chosenItem || {t: 'n', v: 1, c: colors[0]};
+    });
+
+    let pool = [];
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            pool.push(gridMatrix[r][c]);
+        }
+    }
+
+    pool.forEach((d, i) => {
+        const sq = document.createElement('div');
+        sq.className = 'square';
+        sq.id = 'sq-' + i;
+        sq.innerHTML = `<span class="outer-num">${i+1}</span><div class="inner-face ${d.c}">${(d.t==='b'?'💣':(d.t==='x'?'x'+d.v:d.v))}</div>`;
+        
+        sq.onclick = () => {
+            if(isProcessing || sq.classList.contains('open')) return;
+            sq.classList.add('open');
+            currentTurnHistory.push({ id: sq.id, data: d, teamIdx: currentTeamIdx, scoreBefore: teams[currentTeamIdx].score });
+            
+            if (d.t === 'b' || d.t === 'x') {
+                hideMatchingMiniBall(d.t, d.v);
+            }
+
+            if(d.t === 'b') { isProcessing = true; setTimeout(() => triggerExplosion(), 400); }
+            else if(d.t === 'x') {
+                turnPicks.push(d); updateSum();
+            } else if(turnPicks.some(p => (p.c === d.c && p.t === 'n' && d.t === 'n') || (p.v === d.v && p.t === 'n' && d.t === 'n'))) {
+                isProcessing = true; turnPicks = []; setTimeout(resetTurn, 1000);
+            } else { turnPicks.push(d); updateSum(); }
+        };
+        grid.appendChild(sq);
+    });
+  }
+
+  function resetTurn() { 
+    document.querySelectorAll('.square.open').forEach(el => { el.classList.add('shatter'); el.classList.remove('open'); }); 
+    turnPicks = []; 
+    currentTeamIdx = (currentTeamIdx + 1) % teams.length; 
+    updateSum(); 
+    setTimeout(() => { isProcessing = false; renderTeams(); }, 800); 
+  }
+
+  function triggerExplosion() { 
+    playExplosionSound(); 
+    document.body.classList.add('shake'); 
+    const box = document.getElementById(`box-${currentTeamIdx}`); 
+    if (box) box.style.background = "radial-gradient(circle, #ff4d4d 0%, #cc0000 100%)"; 
+    setTimeout(() => { teams[currentTeamIdx].score = 0; turnPicks = []; updateSum(); if(box) box.style.background = ""; resetTurn(); }, 1000); 
+  }
+
+  function playExplosionSound() { 
+    if (!audioCtx) return; 
+    const osc = audioCtx.createOscillator(); 
+    const gain = audioCtx.createGain(); 
+    osc.type = 'sawtooth'; 
+    osc.frequency.setValueAtTime(150, audioCtx.currentTime); 
+    gain.gain.setValueAtTime(0.5, audioCtx.currentTime); 
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5); 
+    osc.connect(gain); 
+    gain.connect(audioCtx.destination); 
+    osc.start(); 
+    osc.stop(audioCtx.currentTime + 0.5); 
+  }
+
+  function openSettings() { document.getElementById('settingsModal').style.display = 'flex'; }
+
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  function nextTurn() {
+    if (isProcessing || turnPicks.length === 0) return;
+    let totalScore = 0;
+    turnPicks.forEach((p, index) => {
+        if (p.t === 'n') totalScore += p.v;
+        else if (p.t === 'x' && index > 0) totalScore *= p.v;
+    });
+    teams[currentTeamIdx].score += totalScore;
+    isProcessing = true; 
+    resetTurn(); 
+  }</script></body></html>
