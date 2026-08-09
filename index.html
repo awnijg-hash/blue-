@@ -41,13 +41,20 @@
         
         .btn-draw { background: #4a287a; color: #fff; border: 2px solid #281442 !important; width: 100%; margin-top: 5px; font-size: 18px; padding: 12px; border-radius: 8px !important; }
 
-        /* النوافذ الداخلية */
-        .internal-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(43, 33, 0, 0.85); z-index: 50; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
-        .internal-modal-card { background: linear-gradient(145deg, #fde48e 0%, #d4af37 100%); border: 3px solid #573f06; padding: 20px; border-radius: 12px; width: 100%; max-width: 320px; position: relative; gap: 12px; display: flex; flex-direction: column; }
-        .close-x-btn { position: absolute; top: 10px; left: 12px; background: transparent; color: #3b2c0d; border: none; font-size: 22px; font-weight: bold; cursor: pointer; }
+        /* نافذة السحب المغطية للشاشة بالكامل */
+        .internal-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #fce07d 0%, #d4af37 50%, #aa771c 100%); z-index: 100; flex-direction: column; justify-content: space-between; align-items: center; padding: 25px 15px; text-align: center; border: 2px solid #573f06; }
         
-        #roll-box { font-size: 24px; font-weight: bold; color: #3b2c0d; margin: 15px 0 10px 0; padding: 15px; background: #fff5cc; border-radius: 8px; border: 2px solid #7c5d12; min-height: 95px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
-        .step-draw-btn { background: #4a287a; color: #fff; border: 2px solid #281442; padding: 10px; font-size: 24px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 5px; }
+        .close-x-btn { position: absolute; top: 15px; left: 15px; background: #a83232; color: #fff; border: 2px solid #5c1818; width: 35px; height: 35px; border-radius: 50%; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        
+        /* خانة السحب الكبيرة طولياً */
+        #roll-box { width: 100%; flex: 1; margin: 45px 0 15px 0; padding: 20px; background: #fff5cc; border-radius: 12px; border: 3px solid #7c5d12; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; box-shadow: inset 0 0 15px rgba(0,0,0,0.1); }
+        
+        .step-draw-btn { background: #4a287a; color: #fff; border: 2px solid #281442; padding: 16px; font-size: 32px; font-weight: bold; border-radius: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .step-draw-btn:active { background: #281442; }
+
+        /* نافذة تأكيد الحذف الداخلية العادية */
+        .delete-modal-box { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(43, 33, 0, 0.85); z-index: 100; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
+        .delete-modal-card { background: linear-gradient(145deg, #fde48e 0%, #d4af37 100%); border: 3px solid #573f06; padding: 20px; border-radius: 12px; width: 100%; max-width: 320px; position: relative; gap: 12px; display: flex; flex-direction: column; }
     </style>
 </head>
 <body onclick="goFullScreen()">
@@ -94,19 +101,19 @@
             <button class="btn-main btn-draw" onclick="playEffect('start'); startDraw()">🎯 بدء الاختيار</button>
         </div>
 
-        <!-- نافذة السحب العشوائي الداخلية -->
+        <!-- نافذة السحب المغطية للشاشة بالكامل مع رقم واسم كبيرين جداً -->
         <div id="draw-modal" class="internal-modal">
-            <div class="internal-modal-card">
-                <button class="close-x-btn" onclick="playEffect('click'); closeDrawModal()">×</button>
-                <div id="roll-box">جاهز للاختيار...</div>
-                <button class="step-draw-btn" onclick="playEffect('step'); nextStepDraw()">⬇</button>
-                <button class="btn-add" style="width:100%; margin-top:5px; background:#235c36;" onclick="playEffect('click'); resetDrawModal()">إعادة</button>
+            <button class="close-x-btn" onclick="playEffect('click'); closeDrawModal()">×</button>
+            <div id="roll-box">جاهز للاختيار...</div>
+            <div style="width: 100%; display: flex; flex-direction: column; gap: 10px;">
+                <button class="step-draw-btn" onclick="playEffect('step'); nextStepDraw()">⬇ التالي</button>
+                <button class="btn-add" style="width:100%; padding: 12px; font-size: 18px; background:#235c36; border: 2px solid #11301c;" onclick="playEffect('click'); resetDrawModal()">إعادة السحب</button>
             </div>
         </div>
 
         <!-- نافذة تأكيد الحذف الداخلية -->
-        <div id="delete-modal" class="internal-modal">
-            <div class="internal-modal-card">
+        <div id="delete-modal" class="delete-modal-box">
+            <div class="delete-modal-card">
                 <h3>تأكيد الحذف</h3>
                 <p id="delete-msg" style="font-weight:bold;"></p>
                 <div style="display:flex; gap:10px;">
@@ -313,9 +320,13 @@
             let box = document.getElementById('roll-box');
             if (drawIndex > 0) {
                 let currentName = drawPool[drawIndex - 1];
-                box.innerHTML = `<span style="color:#7c5d12; font-size:36px; font-weight:900;">${drawIndex}</span><span style="color:#3b2c0d; font-size:22px; font-weight:bold; margin-top:4px;">${currentName}</span>`;
+                // تكبير الرقم طولياً والاسم بشكل بارز وملفت
+                box.innerHTML = `
+                    <div style="font-size: 80px; font-weight: 900; color: #7c5d12; line-height: 1; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">${drawIndex}</div>
+                    <div style="font-size: 36px; font-weight: bold; color: #3b2c0d; word-break: break-word; padding: 0 10px;">${currentName}</div>
+                `;
             } else {
-                box.innerHTML = `<span style="color:#573f06; font-size:22px; font-weight:bold;">🎉 انتهت العناصر!</span>`;
+                box.innerHTML = `<div style="font-size: 32px; font-weight: bold; color: #573f06;">🎉 انتهت العناصر!</div>`;
             }
         }
 
