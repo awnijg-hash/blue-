@@ -3,862 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>منصة المسابقات التفاعلية</title>
+    <title>تطبيق المسابقات الاحترافي</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: #2b2100;
-            color: #2c2200;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .mobile-frame {
-            width: 100%;
-            max-width: 430px;
-            height: 100vh;
-            max-height: 900px;
-            background: linear-gradient(135deg, #fce07d 0%, #d4af37 50%, #aa771c 100%);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
-            border: 2px solid #573f06;
-            box-shadow: 0 0 20px rgba(0,0,0,0.6);
-        }
-
-        #home-screen {
-            flex: 1;
-            background: linear-gradient(145deg, #fde48e 0%, #e6be4ae0 100%);
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .screen-header {
-            font-size: 24px;
-            font-weight: bold;
-            text-align: center;
-            color: #3b2c0d;
-            margin-bottom: 20px;
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.4);
-        }
-
-        .btn-main {
-            background: #fff3c4;
-            color: #3b2c0d;
-            font-weight: bold;
-            padding: 14px;
-            border-radius: 8px;
-            border: 2px solid #7c5d12;
-            font-size: 18px;
-            cursor: pointer;
-            text-align: center;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        /* خانة إضافة مسابقة جديدة داخل التطبيق بدل نوافذ المتصفح */
-        .add-comp-box {
-            background: #fce89c;
-            border: 2px solid #7c5d12;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .add-comp-box input {
-            width: 100%;
-            padding: 10px;
-            border-radius: 6px;
-            border: 2px solid #7c5d12;
-            background: #fff5cc;
-            color: #3b2c0d;
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .competitions-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .competition-item {
-            background: #fff5cc;
-            border: 2px solid #7c5d12;
-            border-radius: 8px;
-            padding: 15px;
-            font-size: 20px;
-            font-weight: bold;
-            text-align: center;
-            cursor: pointer;
-            color: #3b2c0d;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-            position: relative;
-        }
-
-        .delete-comp-btn {
-            position: absolute;
-            top: 6px;
-            left: 8px;
-            background: #a83232;
-            color: #fff;
-            border: 1px solid #5c1818;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            font-size: 14px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        .delete-comp-btn:active {
-            background: #5c1818;
-        }
-
-        #details-screen {
-            display: none;
-            flex: 1;
-            background: linear-gradient(145deg, #fde48e 0%, #dfb743 100%);
-            flex-direction: column;
-            padding: 12px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .details-top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            position: relative;
-            gap: 5px;
-        }
-
-        .back-group {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .back-btn {
-            background: #a83232;
-            color: #fff;
-            border: 2px solid #5c1818;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .total-badge {
-            background: #fff3c4;
-            color: #3b2c0d;
-            border: 2px solid #7c5d12;
-            padding: 5px 8px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .save-top-left {
-            background: #235c36;
-            color: #fff;
-            border: 2px solid #11301c;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .comp-title-display {
-            font-size: 16px;
-            font-weight: bold;
-            color: #3b2c0d;
-            text-align: center;
-            flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .content-area {
-            display: flex;
-            flex: 1;
-            gap: 8px;
-            overflow: hidden;
-        }
-
-        .prizes-column {
-            width: 85px;
-            background: #fce89c;
-            border: 2px solid #7c5d12;
-            border-radius: 8px;
-            padding: 2px 0;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-            height: 100%;
-        }
-
-        .prizes-ticker {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            align-items: center;
-            position: absolute;
-            width: 100%;
-            animation: scrollPrizes 18s linear infinite;
-        }
-
-        @keyframes scrollPrizes {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-50%); }
-        }
-
-        .prize-item {
-            text-align: center;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        .prize-item img {
-            width: 60px;
-            height: auto;
-            max-height: 65px;
-            object-fit: contain;
-            border: none;
-            background: transparent;
-            display: block;
-        }
-
-        .prize-item .price {
-            font-size: 13px;
-            font-weight: bold;
-            color: #3b2c0d;
-            margin-top: 2px;
-            text-shadow: 0 1px 1px rgba(255,255,255,0.5);
-        }
-
-        .participants-column {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            overflow: hidden;
-        }
-
-        .action-row {
-            display: flex;
-            gap: 6px;
-        }
-
-        .action-row input {
-            flex: 1;
-            padding: 8px;
-            border-radius: 6px;
-            border: 2px solid #7c5d12;
-            background: #fff5cc;
-            color: #3b2c0d;
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .action-row button {
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 2px solid #7c5d12;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .btn-add { background: #235c36; color: #fff; border: 2px solid #11301c !important; }
-        .btn-draw { background: #4a287a; color: #fff; border: 2px solid #281442 !important; width: 100%; margin-top: 5px; font-size: 18px; padding: 12px; border-radius: 8px !important; }
-
-        .participants-scroll {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding-right: 2px;
-        }
-
-        .participant-card-mobile {
-            background: #fff5cc;
-            border: 2px solid #7c5d12;
-            border-radius: 8px;
-            padding: 10px 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .p-name {
-            font-size: 17px;
-            font-weight: bold;
-            color: #3b2c0d;
-            flex: 1;
-            text-align: right;
-            padding-left: 10px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .p-right-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .p-shares-box {
-            background: #fff;
-            color: #3b2c0d;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 16px;
-            min-width: 45px;
-            text-align: center;
-            border: 2px solid #7c5d12;
-        }
-
-        .p-arrows {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .arrow-btn {
-            background: #e6be4a;
-            color: #3b2c0d;
-            border: 1px solid #7c5d12;
-            border-radius: 4px;
-            width: 24px;
-            height: 18px;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-        }
-
-        .arrow-btn:active {
-            background: #7c5d12;
-            color: #fff;
-        }
-
-        /* نافذة مدمجة داخلية لتأكيد الحذف أو السحب */
-        .internal-modal {
-            display: none;
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(43, 33, 0, 0.85);
-            z-index: 50;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .internal-modal-card {
-            background: linear-gradient(145deg, #fde48e 0%, #d4af37 100%);
-            border: 3px solid #573f06;
-            padding: 20px;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 320px;
-            position: relative;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .internal-modal-card h3 {
-            color: #3b2c0d;
-            font-size: 18px;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        .btn-confirm-yes { background: #a83232; color: #fff; border: 2px solid #5c1818; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; flex: 1; }
-        .btn-confirm-no { background: #235c36; color: #fff; border: 2px solid #11301c; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; flex: 1; }
-
-        .close-x-btn {
-            position: absolute;
-            top: 10px;
-            left: 12px;
-            background: transparent;
-            color: #3b2c0d;
-            border: none;
-            font-size: 22px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        #roll-box {
-            font-size: 24px;
-            font-weight: bold;
-            color: #3b2c0d;
-            margin: 15px 0 10px 0;
-            padding: 15px;
-            background: #fff5cc;
-            border-radius: 8px;
-            border: 2px solid #7c5d12;
-            min-height: 95px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-
-        .step-draw-btn {
-            background: #4a287a;
-            color: #fff;
-            border: 2px solid #281442;
-            padding: 10px;
-            font-size: 24px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .step-draw-btn:active {
-            background: #281442;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background-color: #2b2100; color: #2c2200; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .mobile-frame { width: 100%; max-width: 430px; height: 100vh; background: linear-gradient(135deg, #fce07d 0%, #d4af37 50%, #aa771c 100%); display: flex; flex-direction: column; overflow: hidden; border: 2px solid #573f06; }
+        #home-screen, #details-screen { flex: 1; display: flex; flex-direction: column; padding: 20px; overflow-y: auto; background: linear-gradient(145deg, #fde48e 0%, #e6be4ae0 100%); }
+        #details-screen { display: none; }
+        .screen-header { font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px; color: #3b2c0d; }
+        .btn-main { background: #fff3c4; color: #3b2c0d; font-weight: bold; padding: 14px; border-radius: 8px; border: 2px solid #7c5d12; text-align: center; cursor: pointer; margin-bottom: 15px; }
+        .add-comp-box { background: #fce89c; border: 2px solid #7c5d12; border-radius: 8px; padding: 12px; margin-bottom: 15px; display: none; flex-direction: column; gap: 8px; }
+        .add-comp-box input { width: 100%; padding: 10px; border-radius: 6px; border: 2px solid #7c5d12; background: #fff5cc; font-size: 16px; }
+        .competition-item { background: #fff5cc; border: 2px solid #7c5d12; border-radius: 8px; padding: 15px; margin-bottom: 10px; text-align: center; font-weight: bold; cursor: pointer; position: relative; }
+        .delete-comp-btn { position: absolute; top: 5px; left: 8px; background: #a83232; color: #fff; width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .internal-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; padding: 20px; }
+        .internal-modal-card { background: #fde48e; padding: 20px; border-radius: 12px; width: 100%; text-align: center; border: 3px solid #573f06; }
+        .btn-confirm { padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; margin: 5px; }
     </style>
 </head>
-<body>
+<body onclick="goFullScreen()">
 
     <div class="mobile-frame">
-
-        <!-- واجهة البداية -->
         <div id="home-screen">
             <div class="screen-header">قائمة المسابقات</div>
-            
-            <button class="btn-main" onclick="playEffect('click'); toggleAddCompBox()">+ إضافة مسابقة جديدة</button>
-            
-            <!-- خانة إدخال اسم المسابقة داخل التطبيق مباشرة (بدون نوافذ متصفح) -->
-            <div id="add-comp-container" class="add-comp-box" style="display: none;">
-                <input type="text" id="new-comp-name-input" placeholder="اكتب اسم المسابقة هنا...">
-                <button class="btn-add" onclick="addNewCompetitionInternal()">حفظ المسابقة</button>
+            <button class="btn-main" onclick="toggleAddCompBox()">+ إضافة مسابقة جديدة</button>
+            <div id="add-comp-container" class="add-comp-box">
+                <input type="text" id="new-comp-name" placeholder="اسم المسابقة...">
+                <button class="btn-main" onclick="addNewComp()">حفظ</button>
             </div>
-
-            <div class="competitions-list" id="comps-list-container"></div>
+            <div id="comps-list"></div>
         </div>
 
-        <!-- واجهة تفاصيل المسابقة -->
         <div id="details-screen">
-            <div class="details-top-bar">
-                <button class="save-top-left" onclick="playEffect('success'); saveDailyRecord()">حفظ</button>
-                <div class="comp-title-display" id="active-comp-title">اسم المسابقة</div>
-                <div class="back-group">
-                    <div class="total-badge" id="total-shares-badge" title="العدد الكلي للاشتراكات">0</div>
-                    <button class="back-btn" onclick="playEffect('click'); goBackHome()">رجوع</button>
-                </div>
-            </div>
-
-            <div class="content-area">
-                <!-- عمود الهدايا المتحركة -->
-                <div class="prizes-column">
-                    <div class="prizes-ticker" id="prizes-ticker-container">
-                        <div class="prize-item"><img src="./Screenshot_20260809_131414_com_zhiliaoapp_musically_LivePlayActivity.jpg" alt=""><div class="price">5000</div></div>
-                        <div class="prize-item"><img src="./Screenshot_20260809_131343_com_zhiliaoapp_musically_LivePlayActivity.jpg" alt=""><div class="price">2150</div></div>
-                        <div class="prize-item"><img src="./Screenshot_20260809_131130_com_zhiliaoapp_musically_LivePlayActivity.jpg" alt=""><div class="price">500</div></div>
-                        <div class="prize-item"><img src="./Screenshot_20260809_131237_com_zhiliaoapp_musically_LivePlayActivity.jpg" alt=""><div class="price">299</div></div>
-                        <div class="prize-item"><img src="./Screenshot_20260809_131054_com_zhiliaoapp_musically_LivePlayActivity.jpg" alt=""><div class="price">199</div></div>
-                        <div class="prize-item"><img src="./Screenshot_20260809_131159_com_zhiliaoapp_musically_LivePlayActivity.jpg" alt=""><div class="price">150</div></div>
-                        <div class="prize-item"><img src="./Screenshot_20260809_130951_com_zhiliaoapp_musically_LivePlayActivity.jpg" alt=""><div class="price">100</div></div>
-                        <div class="prize-item"><img src="./Screenshot_20260809_131414_com_zhiliaoapp_musically_LivePlayActivity.jpg" alt=""><div class="price">5000</div></div>
-                        <div class="prize-item"><img src="./Screenshot_20260809_131343_com_zhiliaoapp_musically_LivePlayActivity.jpg" alt=""><div class="price">2150</div></div>
-                        <div class="prize-item"><img src="./Screenshot_20260809_131130_com_zhiliaoapp_musically_LivePlayActivity.jpg" alt=""><div class="price">500</div></div>
-                        <div class="prize-item"><img src="./Screenshot_20260809_131237_com_zhiliaoapp_musically_LivePlayActivity.jpg" alt=""><div class="price">299</div></div>
-                        <div class="prize-item"><img src="./Screenshot_20260809_131054_com_zhiliaoapp_musically_LivePlayActivity.jpg" alt=""><div class="price">199</div></div>
-                        <div class="prize-item"><img src="./Screenshot_20260809_131159_com_zhiliaoapp_musically_LivePlayActivity.jpg" alt=""><div class="price">150</div></div>
-                        <div class="prize-item"><img src="./Screenshot_20260809_130951_com_zhiliaoapp_musically_LivePlayActivity.jpg" alt=""><div class="price">100</div></div>
-                    </div>
-                </div>
-
-                <!-- المشاركين والأدوات -->
-                <div class="participants-column">
-                    <button class="btn-main" style="padding: 10px; font-size: 15px; margin-bottom: 5px;" onclick="playEffect('click'); toggleAddBox()">+ إضافة مشارك جديد</button>
-                    
-                    <div id="add-participant-container" style="display: none; flex-direction: column; gap: 6px; margin-bottom: 5px; background: #fce89c; padding: 8px; border-radius: 8px; border: 2px solid #7c5d12;">
-                        <div class="action-row">
-                            <input type="text" id="p-name-mob" placeholder="اسم المشارك...">
-                        </div>
-                        <div class="action-row">
-                            <input type="number" id="p-shares-mob" value="1" min="1" placeholder="عدد الاشتراكات">
-                            <button class="btn-add" onclick="playEffect('success'); addParticipantMob()">تأكيد</button>
-                        </div>
-                    </div>
-
-                    <div class="participants-scroll" id="participants-list-mob"></div>
-
-                    <button class="btn-main btn-draw" onclick="playEffect('start'); startDrawMob()">🎯 بدء السحب</button>
-                </div>
-            </div>
+            <div class="screen-header" id="comp-title"></div>
+            <button class="btn-main" onclick="goHome()">رجوع</button>
+            <div id="participants-list"></div>
         </div>
+    </div>
 
-        <!-- نافذة السحب الداخلية -->
-        <div id="draw-modal-mob" class="internal-modal">
-            <div class="internal-modal-card">
-                <button class="close-x-btn" onclick="playEffect('click'); closeDrawMob()">×</button>
-                <div id="roll-box">جاهز للسحب...</div>
-                <button class="step-draw-btn" onclick="playEffect('step'); nextStepDraw()">⬇</button>
-                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
-                    <button class="btn-add" style="padding:8px 20px; font-size:15px; width:100%; background:#235c36; color:#fff; border:2px solid #11301c;" onclick="playEffect('click'); resetDrawModal()">إعادة</button>
-                </div>
-            </div>
+    <!-- نافذة تأكيد حذف داخلية -->
+    <div id="delete-modal" class="internal-modal">
+        <div class="internal-modal-card">
+            <h3 id="del-text">هل أنت متأكد؟</h3>
+            <button class="btn-confirm" style="background:#a83232; color:#fff;" onclick="confirmDelete()">نعم</button>
+            <button class="btn-confirm" onclick="closeModal()">إلغاء</button>
         </div>
-
-        <!-- نافذة تأكيد الحذف الداخلية (بدون نوافذ متصفح) -->
-        <div id="delete-confirm-modal" class="internal-modal">
-            <div class="internal-modal-card">
-                <h3>تأكيد الحذف</h3>
-                <p id="delete-msg-text" style="color:#3b2c0d; font-weight:bold; font-size:15px;"></p>
-                <div class="modal-buttons">
-                    <button class="btn-confirm-yes" onclick="executeDeleteCompetition()">نعم، احذف</button>
-                    <button class="btn-confirm-no" onclick="closeDeleteModal()">إلغاء</button>
-                </div>
-            </div>
-        </div>
-
     </div>
 
     <script>
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-        function playEffect(type) {
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-            let now = audioCtx.currentTime;
-
-            if (type === 'click') {
-                let osc = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, now);
-                osc.frequency.setValueAtTime(400, now + 0.04);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start(now);
-                osc.stop(now + 0.04);
-            } 
-            else if (type === 'step') {
-                let osc = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(300, now);
-                osc.frequency.exponentialRampToValueAtTime(120, now + 0.08);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start(now);
-                osc.stop(now + 0.08);
-            } 
-            else if (type === 'success') {
-                [523.25, 659.25, 783.99].forEach((freq, index) => {
-                    let osc = audioCtx.createOscillator();
-                    let gain = audioCtx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(freq, now + (index * 0.06));
-                    gain.gain.setValueAtTime(0.1, now + (index * 0.06));
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + (index * 0.06) + 0.15);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start(now + (index * 0.06));
-                    osc.stop(now + (index * 0.06) + 0.15);
-                });
-            } 
-            else if (type === 'start') {
-                [400, 600, 800].forEach((freq, index) => {
-                    let osc = audioCtx.createOscillator();
-                    let gain = audioCtx.createGain();
-                    osc.type = 'square';
-                    osc.frequency.setValueAtTime(freq, now + (index * 0.05));
-                    gain.gain.setValueAtTime(0.08, now + (index * 0.05));
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + (index * 0.05) + 0.1);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start(now + (index * 0.05));
-                    osc.stop(now + (index * 0.05) + 0.1);
-                });
+        // تفعيل ملء الشاشة عند أول لمسة
+        function goFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
             }
         }
 
-        let mobileData = JSON.parse(localStorage.getItem('mobileAppComps')) || {
-            competitions: {},
-            currentComp: null
-        };
-
-        let currentDrawPool = [];
-        let drawIndex = 0;
-        let pendingDeleteComp = null;
-
-        window.onload = function() {
-            renderCompetitionsList();
-        };
-
-        function saveMobData() {
-            localStorage.setItem('mobileAppComps', JSON.stringify(mobileData));
-        }
-
-        function renderCompetitionsList() {
-            let container = document.getElementById('comps-list-container');
-            container.innerHTML = "";
-            let keys = Object.keys(mobileData.competitions);
-
-            if (keys.length === 0) {
-                container.innerHTML = `<div style="text-align:center; color:#573f06; margin-top:30px; font-size:16px;">لا توجد مسابقات مسجلة حالياً.<br>اضغط على زر الإضافة للبدء!</div>`;
-                return;
-            }
-
-            keys.forEach(compName => {
-                let div = document.createElement('div');
-                div.className = 'competition-item';
-                div.innerHTML = `
-                    <span>${compName}</span>
-                    <button class="delete-comp-btn" onclick="event.stopPropagation(); promptDeleteCompetition('${compName}')">×</button>
-                `;
-                div.onclick = () => { playEffect('click'); openCompetition(compName); };
-                container.appendChild(div);
-            });
-        }
+        let comps = JSON.parse(localStorage.getItem('appComps')) || {};
+        let delTarget = null;
 
         function toggleAddCompBox() {
             let box = document.getElementById('add-comp-container');
-            box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
-            if(box.style.display === 'flex') {
-                document.getElementById('new-comp-name-input').focus();
-            }
+            box.style.display = (box.style.display === 'flex') ? 'none' : 'flex';
         }
 
-        function addNewCompetitionInternal() {
-            let input = document.getElementById('new-comp-name-input');
-            let name = input.value.trim();
-
-            if (name === "") {
-                playEffect('click');
-                return;
-            }
-
-            if (!mobileData.competitions[name]) {
-                playEffect('success');
-                mobileData.competitions[name] = [];
-                saveMobData();
-                input.value = "";
+        function addNewComp() {
+            let name = document.getElementById('new-comp-name').value.trim();
+            if (name) {
+                comps[name] = [];
+                localStorage.setItem('appComps', JSON.stringify(comps));
+                renderComps();
                 toggleAddCompBox();
-                renderCompetitionsList();
-            } else {
-                playEffect('click');
-                input.style.borderColor = '#a83232';
-                setTimeout(() => { input.style.borderColor = '#7c5d12'; }, 1000);
             }
         }
 
-        function promptDeleteCompetition(compName) {
-            playEffect('click');
-            pendingDeleteComp = compName;
-            document.getElementById('delete-msg-text').innerText = `هل أنت متأكد من حذف مسابقة "${compName}"؟`;
-            document.getElementById('delete-confirm-modal').style.display = 'flex';
+        function renderComps() {
+            let list = document.getElementById('comps-list');
+            list.innerHTML = "";
+            Object.keys(comps).forEach(name => {
+                let div = document.createElement('div');
+                div.className = 'competition-item';
+                div.innerHTML = `${name} <span class="delete-comp-btn" onclick="event.stopPropagation(); promptDelete('${name}')">×</span>`;
+                div.onclick = () => openComp(name);
+                list.appendChild(div);
+            });
         }
 
-        function closeDeleteModal() {
-            playEffect('click');
-            pendingDeleteComp = null;
-            document.getElementById('delete-confirm-modal').style.display = 'none';
+        function promptDelete(name) {
+            delTarget = name;
+            document.getElementById('del-text').innerText = `حذف "${name}"؟`;
+            document.getElementById('delete-modal').style.display = 'flex';
         }
 
-        function executeDeleteCompetition() {
-            if (pendingDeleteComp) {
-                playEffect('success');
-                delete mobileData.competitions[pendingDeleteComp];
-                if (mobileData.currentComp === pendingDeleteComp) {
-                    mobileData.currentComp = null;
-                }
-                saveMobData();
-                renderCompetitionsList();
-            }
-            closeDeleteModal();
+        function closeModal() { document.getElementById('delete-modal').style.display = 'none'; }
+
+        function confirmDelete() {
+            delete comps[delTarget];
+            localStorage.setItem('appComps', JSON.stringify(comps));
+            renderComps();
+            closeModal();
         }
 
-        function openCompetition(name) {
-            mobileData.currentComp = name;
-            document.getElementById('active-comp-title').innerText = name;
+        function openComp(name) {
+            document.getElementById('comp-title').innerText = name;
             document.getElementById('home-screen').style.display = 'none';
             document.getElementById('details-screen').style.display = 'flex';
-            renderParticipantsMob();
         }
 
-        function goBackHome() {
+        function goHome() {
             document.getElementById('details-screen').style.display = 'none';
             document.getElementById('home-screen').style.display = 'flex';
-            renderCompetitionsList();
         }
 
-        function toggleAddBox() {
-            let box = document.getElementById('add-participant-container');
-            box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
-        }
-
-        function addParticipantMob() {
-            let nameInput = document.getElementById('p-name-mob');
-            let sharesInput = document.getElementById('p-shares-mob');
-            let name = nameInput.value.trim();
-            let shares = parseInt(sharesInput.value) || 1;
-
-            if (name === "") {
-                return;
-            }
-
-            let currentList = mobileData.competitions[mobileData.currentComp];
-            currentList.push({ name: name, shares: shares });
-            nameInput.value = "";
-            sharesInput.value = "1";
-            toggleAddBox();
-
-            saveMobData();
-            renderParticipantsMob();
-        }
-
-        function modifySharesMob(index, amount) {
-            playEffect('step');
-            let list = mobileData.competitions[mobileData.currentComp];
-            list[index].shares += amount;
-            if (list[index].shares < 1) list[index].shares = 1;
-            saveMobData();
-            renderParticipantsMob();
-        }
-
-        function renderParticipantsMob() {
-            let container = document.getElementById('participants-list-mob');
-            container.innerHTML = "";
-            let list = mobileData.competitions[mobileData.currentComp] || [];
-
-            let totalShares = 0;
-
-            list.forEach((p, idx) => {
-                totalShares += p.shares;
-                let card = document.createElement('div');
-                card.className = 'participant-card-mobile';
-                card.innerHTML = `
-                    <div class="p-name">${idx + 1}. ${p.name}</div>
-                    <div class="p-right-group">
-                        <div class="p-shares-box">${p.shares}</div>
-                        <div class="p-arrows">
-                            <button class="arrow-btn" onclick="modifySharesMob(${idx}, 1)">▲</button>
-                            <button class="arrow-btn" onclick="modifySharesMob(${idx}, -1)">▼</button>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-
-            document.getElementById('total-shares-badge').innerText = totalShares;
-        }
-
-        function saveDailyRecord() {
-            // حفظ داخلي بدون رسائل مزعجة
-            playEffect('success');
-        }
-
-        function startDrawMob() {
-            let list = mobileData.competitions[mobileData.currentComp];
-            if (!list || list.length === 0) {
-                return;
-            }
-
-            currentDrawPool = [];
-            list.forEach(p => {
-                for(let i = 0; i < p.shares; i++) {
-                    currentDrawPool.push(p.name);
-                }
-            });
-            currentDrawPool.sort(() => Math.random() - 0.5);
-
-            drawIndex = currentDrawPool.length;
-            
-            updateRollBoxDisplay();
-            document.getElementById('draw-modal-mob').style.display = 'flex';
-        }
-
-        function updateRollBoxDisplay() {
-            let box = document.getElementById('roll-box');
-            if (drawIndex > 0) {
-                let currentName = currentDrawPool[drawIndex - 1];
-                box.innerHTML = `<span style="color:#7c5d12; font-size:36px; font-weight:900; line-height:1.1;">${drawIndex}</span><span style="color:#3b2c0d; font-size:22px; font-weight:bold; margin-top:4px;">${currentName}</span>`;
-            } else {
-                box.innerHTML = `<span style="color:#573f06; font-size:22px; font-weight:bold;">🎉 انتهت جميع الأرقام!</span>`;
-            }
-        }
-
-        function nextStepDraw() {
-            if (drawIndex > 0) {
-                drawIndex--;
-                updateRollBoxDisplay();
-            }
-        }
-
-        function resetDrawModal() {
-            let list = mobileData.competitions[mobileData.currentComp];
-            if (!list) return;
-            currentDrawPool = [];
-            list.forEach(p => {
-                for(let i = 0; i < p.shares; i++) {
-                    currentDrawPool.push(p.name);
-                }
-            });
-            currentDrawPool.sort(() => Math.random() - 0.5);
-            drawIndex = currentDrawPool.length;
-            updateRollBoxDisplay();
-        }
-
-        function closeDrawMob() {
-            document.getElementById('draw-modal-mob').style.display = 'none';
-        }
+        window.onload = renderComps;
     </script>
 </body>
 </html>
