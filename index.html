@@ -32,12 +32,21 @@
         .btn-add { background: #235c36; color: #fff; padding: 8px 12px; border-radius: 6px; border: 2px solid #11301c; cursor: pointer; font-weight: bold; }
         
         .participants-scroll { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-top: 5px; }
-        .participant-card-mobile { background: #fff5cc; border: 2px solid #7c5d12; border-radius: 8px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; }
-        .p-name { font-size: 17px; font-weight: bold; color: #3b2c0d; flex: 1; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .p-right-group { display: flex; align-items: center; gap: 8px; }
-        .p-shares-box { background: #fff; color: #3b2c0d; padding: 4px 10px; border-radius: 6px; font-weight: bold; font-size: 16px; min-width: 45px; text-align: center; border: 2px solid #7c5d12; }
-        .p-arrows { display: flex; flex-direction: column; gap: 2px; }
-        .arrow-btn { background: #e6be4a; color: #3b2c0d; border: 1px solid #7c5d12; border-radius: 4px; width: 24px; height: 18px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+        
+        /* تنسيق بطاقة المشترك الجديد بدون أي تداخل */
+        .participant-card-mobile { background: #fff5cc; border: 2px solid #7c5d12; border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; position: relative; }
+        .p-top-row { display: flex; justify-content: space-between; align-items: center; padding-left: 20px; }
+        .p-name { font-size: 16px; font-weight: bold; color: #3b2c0d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; flex: 1; }
+        .p-name:hover { color: #573f06; text-decoration: underline; }
+        
+        /* زر X بدون خلفية وبدون دوائر في زاوية البطاقة */
+        .p-delete-text-btn { position: absolute; top: 4px; left: 6px; background: none; border: none; color: #a83232; font-size: 18px; font-weight: 900; cursor: pointer; padding: 0; line-height: 1; }
+        .p-delete-text-btn:hover { color: #ff0000; }
+
+        .p-bottom-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed #d4af37; padding-top: 4px; }
+        .p-shares-box { background: #fff; color: #3b2c0d; padding: 2px 10px; border-radius: 6px; font-weight: bold; font-size: 15px; min-width: 45px; text-align: center; border: 2px solid #7c5d12; }
+        .p-arrows { display: flex; gap: 4px; }
+        .arrow-btn { background: #e6be4a; color: #3b2c0d; border: 1px solid #7c5d12; border-radius: 4px; width: 28px; height: 22px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
         
         .btn-draw { background: #4a287a; color: #fff; border: 2px solid #281442 !important; width: 100%; margin-top: 5px; font-size: 18px; padding: 12px; border-radius: 8px !important; }
 
@@ -46,7 +55,6 @@
         
         .close-x-btn { position: absolute; top: 15px; left: 15px; background: #a83232; color: #fff; border: 2px solid #5c1818; width: 35px; height: 35px; border-radius: 50%; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         
-        /* خانة السحب الكبيرة طولياً */
         #roll-box { width: 100%; flex: 1; margin: 45px 0 15px 0; padding: 20px; background: #fff5cc; border-radius: 12px; border: 3px solid #7c5d12; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; box-shadow: inset 0 0 15px rgba(0,0,0,0.1); }
         
         .step-draw-btn { background: #4a287a; color: #fff; border: 2px solid #281442; padding: 16px; font-size: 32px; font-weight: bold; border-radius: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
@@ -101,7 +109,7 @@
             <button class="btn-main btn-draw" onclick="playEffect('start'); startDraw()">🎯 بدء الاختيار</button>
         </div>
 
-        <!-- نافذة السحب المغطية للشاشة بالكامل مع رقم واسم كبيرين جداً -->
+        <!-- نافذة السحب المغطية للشاشة بالكامل -->
         <div id="draw-modal" class="internal-modal">
             <button class="close-x-btn" onclick="playEffect('click'); closeDrawModal()">×</button>
             <div id="roll-box">جاهز للاختيار...</div>
@@ -169,6 +177,7 @@
         let appData = JSON.parse(localStorage.getItem('pureAppData')) || { items: {} };
         let currentOpen = "";
         let pendingDelete = null;
+        let pendingSubDelete = null;
         let drawPool = [];
         let drawIndex = 0;
 
@@ -216,13 +225,24 @@
         function promptDelete(name) {
             playEffect('click');
             pendingDelete = name;
-            document.getElementById('delete-msg').innerText = `حذف "${name}"؟`;
+            pendingSubDelete = null;
+            document.getElementById('delete-msg').innerText = `حذف القائمة "${name}"؟`;
+            document.getElementById('delete-modal').style.display = 'flex';
+        }
+
+        function promptSubDelete(idx) {
+            playEffect('click');
+            pendingSubDelete = idx;
+            pendingDelete = null;
+            let subItemName = appData.items[currentOpen][idx].name;
+            document.getElementById('delete-msg').innerText = `حذف المشترك "${subItemName}"؟`;
             document.getElementById('delete-modal').style.display = 'flex';
         }
 
         function closeDeleteModal() {
             playEffect('click');
             pendingDelete = null;
+            pendingSubDelete = null;
             document.getElementById('delete-modal').style.display = 'none';
         }
 
@@ -232,6 +252,11 @@
                 delete appData.items[pendingDelete];
                 save();
                 renderList();
+            } else if (pendingSubDelete !== null) {
+                playEffect('success');
+                appData.items[currentOpen].splice(pendingSubDelete, 1);
+                save();
+                renderSubList();
             }
             closeDeleteModal();
         }
@@ -265,6 +290,21 @@
             }
         }
 
+        function editSubItemName(idx) {
+            playEffect('click');
+            let currentName = appData.items[currentOpen][idx].name;
+            let newName = prompt("تعديل اسم المشترك:", currentName);
+            if (newName !== null) {
+                newName = newName.trim();
+                if (newName !== "") {
+                    playEffect('success');
+                    appData.items[currentOpen][idx].name = newName;
+                    save();
+                    renderSubList();
+                }
+            }
+        }
+
         function modifyVal(index, amount) {
             playEffect('step');
             let list = appData.items[currentOpen];
@@ -285,8 +325,11 @@
                 let card = document.createElement('div');
                 card.className = 'participant-card-mobile';
                 card.innerHTML = `
-                    <div class="p-name">${idx + 1}. ${item.name}</div>
-                    <div class="p-right-group">
+                    <button class="p-delete-text-btn" onclick="promptSubDelete(${idx})">×</button>
+                    <div class="p-top-row">
+                        <div class="p-name" onclick="editSubItemName(${idx})" title="اضغط لتعديل الاسم">${idx + 1}. ${item.name}</div>
+                    </div>
+                    <div class="p-bottom-row">
                         <div class="p-shares-box">${item.val}</div>
                         <div class="p-arrows">
                             <button class="arrow-btn" onclick="modifyVal(${idx}, 1)">▲</button>
@@ -320,7 +363,6 @@
             let box = document.getElementById('roll-box');
             if (drawIndex > 0) {
                 let currentName = drawPool[drawIndex - 1];
-                // تكبير الرقم طولياً والاسم بشكل بارز وملفت
                 box.innerHTML = `
                     <div style="font-size: 80px; font-weight: 900; color: #7c5d12; line-height: 1; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">${drawIndex}</div>
                     <div style="font-size: 36px; font-weight: bold; color: #3b2c0d; word-break: break-word; padding: 0 10px;">${currentName}</div>
