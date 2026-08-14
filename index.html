@@ -49,11 +49,11 @@
 
         /* نافذة السحب العادي */
         .internal-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #fce07d 0%, #d4af37 50%, #aa771c 100%); z-index: 100; flex-direction: column; justify-content: space-between; align-items: center; padding: 25px 15px; text-align: center; border: 2px solid #573f06; }
-        .close-x-btn { position: absolute; top: 15px; left: 15px; background: #a83232; color: #fff; border: 2px solid #5c1818; width: 35px; height: 35px; border-radius: 50%; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .close-x-btn { position: absolute; top: 15px; left: 15px; background: #a83232; color: #fff; border: 2px solid #5c1818; width: 35px; height: 35px; border-radius: 50%; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 250; }
         #roll-box { width: 100%; flex: 1; margin: 45px 0 15px 0; padding: 20px; background: #fff5cc; border-radius: 12px; border: 3px solid #7c5d12; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; box-shadow: inset 0 0 15px rgba(0,0,0,0.1); }
         .step-draw-btn { background: #4a287a; color: #fff; border: 2px solid #281442; padding: 16px; font-size: 32px; font-weight: bold; border-radius: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
 
-        /* تصميم نافذة الروليت الجديدة: ترويسة وأزرار بالاعلى، ومساحة بان/زوم واسعة بالأسفل */
+        /* نافذة روليت العجلة المطورة */
         #roulette-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #2b2100 0%, #573f06 100%); z-index: 200; flex-direction: column; justify-content: flex-start; align-items: center; padding: 8px; text-align: center; overflow: hidden; }
         
         .roulette-header-fixed { width: 100%; display: flex; flex-direction: column; gap: 4px; z-index: 220; flex-shrink: 0; }
@@ -64,18 +64,18 @@
         .control-group input[type="checkbox"] { width: 15px; height: 15px; accent-color: #235c36; cursor: pointer; }
         .btn-shuffle { background: #b8860b; color: #fff; border: 1px solid #8b6508; padding: 2px 6px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; }
 
-        /* مساحة العرض السفلية الحرة (Pan & Zoom Viewport) */
+        /* مساحة العرض السفلية الحرة (Pan, Zoom & Mouse Wheel Viewport) */
         .roulette-viewport { width: 100%; flex: 1; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px dashed #d4af37; margin-top: 4px; touch-action: none; }
         
-        /* الحاوية الداخلية القابلة للتكبير والتحريك باللمس أو الماوس */
         .roulette-transform-container { position: absolute; display: flex; justify-content: center; align-items: center; cursor: grab; }
         .roulette-transform-container:active { cursor: grabbing; }
 
-        /* أبعاد الكانفاس الداخلي الضخم لتتحمل مئات الأسماء دون تأثر الجودة */
-        canvas { border-radius: 50%; border: 4px solid #d4af37; box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); background: #fff5cc; width: 600px; height: 600px; }
+        canvas { border-radius: 50%; border: 4px solid #d4af37; box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); background: #fff5cc; width: 1200px; height: 1200px; }
         .roulette-pointer { position: absolute; top: -10px; width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 24px solid #ff3333; z-index: 230; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); pointer-events: none; }
         
-        #winner-display { font-size: 15px; font-weight: bold; color: #fce07d; margin: 2px 0; min-height: 22px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
+        /* لوحة اسم الفائز المنتصفية البارزة */
+        #winner-banner { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(43, 33, 0, 0.95); border: 3px solid #d4af37; border-radius: 14px; padding: 20px 25px; z-index: 240; text-align: center; box-shadow: 0 0 30px rgba(212,175,55,0.7); max-width: 90%; animation: popIn 0.3s ease-out; }
+        @keyframes popIn { from { transform: translate(-50%, -50%) scale(0.7); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
 
         /* نافذة تأكيد الحذف */
         .delete-modal-box { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(43, 33, 0, 0.85); z-index: 100; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
@@ -139,7 +139,7 @@
             </div>
         </div>
 
-        <!-- نافذة روليت العجلة المطورة (ترويسة ثابتة + مساحة واسعة للسحب والتكبير) -->
+        <!-- نافذة روليت العجلة المطورة -->
         <div id="roulette-modal">
             <button class="close-x-btn" onclick="playEffect('click'); closeRouletteModal()">×</button>
             
@@ -148,8 +148,8 @@
                 
                 <div class="roulette-controls">
                     <div class="control-group">
-                        <span>الحجم:</span>
-                        <input type="range" id="wheelZoomRange" min="0.5" max="2.5" step="0.1" value="1" oninput="updateWheelZoom(this.value)">
+                        <span>الحجم (أو عجلة الماوس):</span>
+                        <input type="range" id="wheelZoomRange" min="0.3" max="4.0" step="0.1" value="1" oninput="updateWheelZoom(this.value)">
                     </div>
                     <div class="control-group">
                         <span>حذف الفائز:</span>
@@ -164,17 +164,20 @@
                 </div>
             </div>
 
-            <!-- مساحة سفلية حرة تتيح لك سحب العجلة بكل اتجاه وتكبيرها براحتك -->
+            <!-- مساحة العرض السفلية مع دعم عجلة الفأرة للتكبير والتصغير الحر -->
             <div class="roulette-viewport" id="rouletteViewport">
                 <div class="roulette-transform-container" id="transformContainer">
                     <div class="roulette-pointer"></div>
-                    <!-- كانفاس دقة عالية جداً ومساحة ضخمة تستوعب مئات الأسماء -->
                     <canvas id="wheelCanvas" width="1200" height="1200"></canvas>
+                </div>
+                <!-- لوحة اسم الفائز في وسط الشاشة مباشرة وتبقى ظاهرة حتى تدور مجدداً -->
+                <div id="winner-banner">
+                    <div style="color: #d4af37; font-size: 14px; margin-bottom: 4px;">🎉 الفائز في المنتصف 🎉</div>
+                    <div id="winnerNameText" style="color: #fff; font-size: 24px; font-weight: 900; word-break: break-word;"></div>
                 </div>
             </div>
             
-            <div id="winner-display">اضغط زر التدوير بالأسفل!</div>
-            <button class="btn-add" style="width:100%; padding: 8px; font-size: 15px; background:#b8860b; border: 2px solid #8b6508; flex-shrink:0;" onclick="spinWheel()">🎲 ادور العجلة الآن</button>
+            <button class="btn-add" style="width:100%; padding: 10px; font-size: 16px; background:#b8860b; border: 2px solid #8b6508; flex-shrink:0;" onclick="spinWheel()">🎲 دور الشاشة الآن</button>
         </div>
 
         <!-- نافذة تأكيد الحذف -->
@@ -203,35 +206,35 @@
             let now = audioCtx.currentTime;
             if (type === 'click') {
                 let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
-                osc.frequency.setValueAtTime(800, now); osc.frequency.setValueAtTime(400, now + 0.04);
-                gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+                osc.frequency.setValueAtTime(900, now); osc.frequency.setValueAtTime(500, now + 0.04);
+                gain.gain.setValueAtTime(0.15, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
                 osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.04);
             } else if (type === 'step') {
                 let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
-                osc.type = 'triangle'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(120, now + 0.08);
-                gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(400, now); osc.frequency.exponentialRampToValueAtTime(150, now + 0.08);
+                gain.gain.setValueAtTime(0.25, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
                 osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.08);
             } else if (type === 'success') {
-                [523.25, 659.25, 783.99].forEach((freq, index) => {
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, index) => {
                     let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
-                    osc.frequency.setValueAtTime(freq, now + (index * 0.06));
-                    gain.gain.setValueAtTime(0.1, now + (index * 0.06));
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + (index * 0.06) + 0.15);
-                    osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now + (index * 0.06)); osc.stop(now + (index * 0.06) + 0.15);
+                    osc.frequency.setValueAtTime(freq, now + (index * 0.08));
+                    gain.gain.setValueAtTime(0.2, now + (index * 0.08));
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + (index * 0.08) + 0.2);
+                    osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now + (index * 0.08)); osc.stop(now + (index * 0.08) + 0.2);
                 });
             } else if (type === 'start') {
-                [400, 600, 800].forEach((freq, index) => {
+                [350, 550, 750, 950].forEach((freq, index) => {
                     let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
                     osc.type = 'square'; osc.frequency.setValueAtTime(freq, now + (index * 0.05));
-                    gain.gain.setValueAtTime(0.08, now + (index * 0.05));
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + (index * 0.05) + 0.1);
-                    osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now + (index * 0.05)); osc.stop(now + (index * 0.05) + 0.1);
+                    gain.gain.setValueAtTime(0.12, now + (index * 0.05));
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + (index * 0.05) + 0.12);
+                    osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now + (index * 0.05)); osc.stop(now + (index * 0.05) + 0.12);
                 });
             } else if (type === 'tick') {
                 let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
-                osc.type = 'sine'; osc.frequency.setValueAtTime(1200, now); osc.frequency.exponentialRampToValueAtTime(400, now + 0.02);
-                gain.gain.setValueAtTime(0.03, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
-                osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.02);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(1400, now); osc.frequency.exponentialRampToValueAtTime(500, now + 0.025);
+                gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+                osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.025);
             }
         }
 
@@ -477,7 +480,7 @@
             });
             currentRoulettePool.sort(() => Math.random() - 0.5);
 
-            document.getElementById('winner-display').innerText = "اضغط زر التدوير بالأسفل!";
+            document.getElementById('winner-banner').style.display = 'none';
             document.getElementById('roulette-modal').style.display = 'flex';
             currentZoom = 1;
             panX = 0;
@@ -497,6 +500,7 @@
 
         function updateWheelZoom(val) {
             currentZoom = parseFloat(val);
+            document.getElementById('wheelZoomRange').value = currentZoom;
             updateTransform();
         }
 
@@ -505,7 +509,7 @@
             container.style.transform = `translate(${panX}px, ${panY}px) scale(${currentZoom})`;
         }
 
-        // تفاعل السحب بالأصابع أو الماوس لتحريك العجلة يميناً ويساراً داخل المساحة السفلية
+        // دعم تحريك العجلة بالسحب بالأصابع أو الماوس
         let isDragging = false;
         let startX, startY;
         const viewport = document.getElementById('rouletteViewport');
@@ -529,11 +533,22 @@
             viewport.releasePointerCapture(e.pointerId);
         });
 
+        // دعم التكبير والتصغير الحر بواسطة عجلة الماوس (Mouse Wheel Zoom)
+        viewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            playEffect('step');
+            if (e.deltaY < 0) {
+                currentZoom = Math.min(currentZoom + 0.15, 4.0); // تقريب وتكبير
+            } else {
+                currentZoom = Math.max(currentZoom - 0.15, 0.3); // إبعاد وتصغير
+            }
+            updateWheelZoom(currentZoom);
+        }, { passive: false });
+
         function shuffleRouletteItems() {
             if (isSpinning) return;
             currentRoulettePool.sort(() => Math.random() - 0.5);
             drawWheel(wheelAngle);
-            document.getElementById('winner-display').innerText = "🔀 تم خلط الأماكن بنجاح!";
         }
 
         function drawWheel(angle) {
@@ -564,14 +579,15 @@
                 ctx.fill();
                 ctx.stroke();
 
-                if (total <= 300) {
+                // التعامل مع عدد الأسماء الضخم ورسمها بوضوح
+                if (total <= 350) {
                     ctx.save();
                     ctx.rotate(currentAngle + arcSize / 2);
                     ctx.fillStyle = '#2b2100';
-                    let fontSize = total > 150 ? 9 : (total > 80 ? 12 : 18);
+                    let fontSize = total > 180 ? 8 : (total > 90 ? 11 : 16);
                     ctx.font = `bold ${fontSize}px sans-serif`;
-                    let displayName = currentRoulettePool[i].length > 7 ? currentRoulettePool[i].substring(0, 7) + '..' : currentRoulettePool[i];
-                    ctx.fillText(displayName, radius / 1.35, 5);
+                    let displayName = currentRoulettePool[i].length > 8 ? currentRoulettePool[i].substring(0, 8) + '..' : currentRoulettePool[i];
+                    ctx.fillText(displayName, radius / 1.35, 4);
                     ctx.restore();
                 }
             }
@@ -581,17 +597,18 @@
         function spinWheel() {
             if (isSpinning) return;
             if (currentRoulettePool.length === 0) {
-                document.getElementById('winner-display').innerText = "🎉 انتهت جميع الأسهم!";
+                alert("انتهت جميع العناصر!");
                 return;
             }
 
-            isSpinning = true;
-            document.getElementById('winner-display').innerText = "العجلة تدور...";
+            // إخفاء نافذة الفائز القديمة فوراً عند الضغط لتدوير الشاشة من جديد
+            document.getElementById('winner-banner').style.display = 'none';
 
+            isSpinning = true;
             let durationSeconds = parseInt(document.getElementById('spinDurationRange').value) || 5;
             let duration = durationSeconds * 1000;
 
-            let randomSpins = 4 + durationSeconds * 2; 
+            let randomSpins = 5 + durationSeconds * 2; 
             let targetAngle = wheelAngle + (randomSpins * 2 * Math.PI) + Math.random() * (2 * Math.PI);
             let startTime = null;
             let lastTickAngle = 0;
@@ -623,7 +640,9 @@
                     let winningIndex = Math.floor((2 * Math.PI - (wheelAngle % (2 * Math.PI)) + Math.PI / 2) / arcSize) % total;
                     let winnerName = currentRoulettePool[winningIndex];
 
-                    document.getElementById('winner-display').innerHTML = `🎉 الفائز: <span style="color:#fff; font-size:16px;">${winnerName}</span>`;
+                    // إظهار اسم الفائز في وسط الشاشة مباشرة ويبقى ثابتاً لا ينغلق إلا عند الدوران مجدداً
+                    document.getElementById('winnerNameText').innerText = winnerName;
+                    document.getElementById('winner-banner').style.display = 'block';
 
                     let shouldRemove = document.getElementById('removeWinnerCheck').checked;
                     if (shouldRemove) {
@@ -633,7 +652,7 @@
                         }
                         setTimeout(() => {
                             drawWheel(wheelAngle);
-                        }, 500);
+                        }, 400);
                     }
                 }
             }
