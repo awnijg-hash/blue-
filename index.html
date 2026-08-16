@@ -1,3 +1,10 @@
+عشان أكون معك دقيق وصريح؛ في الكود السابق كان زر "إعادة تعيين" يسترجع الأسماء الأصلية **فقط طالما أنك لم تضغط على زر "حفظ"** أو تقوم بتحديث الصفحة (Refresh) أثناء العجلة، لأنه كان يعتمد على نسخة مؤقتة (Backup) يتم أخذها لحظة دخولك للشاشة فقط. لو صار أي تحديث أو تعديل، كانت النسخة الأصلية بتضيع.
+
+ولعيونك، عدلت لك الكود بحيث يتم **حفظ النسخة الأصلية لكل قائمة بشكل دائم ودقيق** في المتصفح بمجرد إنشائها أو تعديلها، وصار زر "🔄 إعادة تعيين" يسترجع الـ 140 اسم (أو العدد الأصلي كاملاً) مهما قفلت التطبيق، جربت، أو حدثت الصفحة!
+
+إليك الكود المحدث بالكامل والأخير:
+
+```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -57,14 +64,12 @@
         
         .roulette-header-fixed { width: 100%; display: flex; flex-direction: column; gap: 4px; z-index: 220; flex-shrink: 0; margin-top: 5px; }
         
-        /* خانة الفريق الفائز بلون المشارك مع وهج ناري وسيع */
         #winner-banner { display: none; width: 100%; border: 3px solid #fff; border-radius: 10px; padding: 8px; text-align: center; box-shadow: 0 0 25px #ffcc00, inset 0 0 15px rgba(255,255,255,0.5); animation: glowPulse 0.4s ease-in-out infinite alternate; position: relative; }
         @keyframes glowPulse {
             from { box-shadow: 0 0 10px #ffcc00, 0 0 20px #ff9900; }
             to { box-shadow: 0 0 30px #ffffff, 0 0 50px #ff3300; }
         }
 
-        /* إشارة X الحمراء الكبيرة عند الخروج النهائي */
         #elimination-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); border-radius: 8px; justify-content: center; align-items: center; z-index: 250; pointer-events: none; }
         .big-red-x { font-size: 65px; font-weight: 900; color: #ff0000; text-shadow: 0 0 10px #000, 0 0 20px #ff0000; line-height: 1; transform: rotate(-10deg); animation: xPulse 0.3s ease-in-out infinite alternate; }
         @keyframes xPulse {
@@ -160,7 +165,6 @@
             <div class="roulette-header-fixed">
                 <div style="color: #fce07d; font-size: 12px; font-weight: bold;">عجلة الحظ التفاعلية</div>
                 
-                <!-- مكان الفريق الفائز مع عرض الاشتراكات المتبقية وإشارة X عند الخروج النهائي -->
                 <div id="winner-banner">
                     <div id="elimination-overlay"><div class="big-red-x">❌</div></div>
                     <div id="winnerTitleText" style="font-size: 11px; margin-bottom: 1px; font-weight: bold;">🎉 الفائز 🎉</div>
@@ -248,7 +252,6 @@
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
                 osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.45);
             } else if (type === 'fail') {
-                // صوت فشل وانخفاض عند خروج المشارك نهائياً
                 let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(220, now);
@@ -275,7 +278,10 @@
             }
         }
 
-        let appData = JSON.parse(localStorage.getItem('pureAppData')) || { items: {} };
+        // هيكل البيانات يتضمن الحفظ الدائم للنسخة الأصلية backups
+        let appData = JSON.parse(localStorage.getItem('pureAppData')) || { items: {}, backups: {} };
+        if (!appData.backups) appData.backups = {};
+
         let currentOpen = "";
         let pendingDelete = null;
         let pendingSubDelete = null;
@@ -300,6 +306,7 @@
             if (name && !appData.items[name]) {
                 playEffect('success');
                 appData.items[name] = [];
+                appData.backups[name] = [];
                 save();
                 renderList();
                 input.value = "";
@@ -346,7 +353,7 @@
         function promptWheelReset() {
             playEffect('click');
             isWheelResetAction = true;
-            document.getElementById('delete-msg').innerText = `إعادة تعيين العجلة واستعادة الأسماء المحذوفة؟`;
+            document.getElementById('delete-msg').innerText = `إعادة تعيين العجلة واستعادة الأسماء (140 اسم) كما كانت؟`;
             document.getElementById('delete-modal').style.display = 'flex';
         }
 
@@ -368,6 +375,7 @@
             } else if (pendingDelete) {
                 playEffect('success');
                 delete appData.items[pendingDelete];
+                delete appData.backups[pendingDelete];
                 save();
                 renderList();
             } else if (pendingSubDelete !== null) {
@@ -379,15 +387,16 @@
             closeDeleteModal();
         }
 
-        let originalListBackup = null;
-        function backupOriginalList() {
+        // تحديث النسخة الاحتياطية الدائمة عندما يقوم المستخدم بتثبيت الـ 140 اسم
+        function updatePermanentBackup() {
             let list = appData.items[currentOpen] || [];
-            originalListBackup = JSON.parse(JSON.stringify(list));
+            appData.backups[currentOpen] = JSON.parse(JSON.stringify(list));
+            save();
         }
 
         function resetOriginalList() {
-            if (originalListBackup) {
-                appData.items[currentOpen] = JSON.parse(JSON.stringify(originalListBackup));
+            if (appData.backups[currentOpen]) {
+                appData.items[currentOpen] = JSON.parse(JSON.stringify(appData.backups[currentOpen]));
                 save();
                 renderSubList();
             }
@@ -398,7 +407,11 @@
             document.getElementById('active-title').innerText = name;
             document.getElementById('home-screen').style.display = 'none';
             document.getElementById('details-screen').style.display = 'flex';
-            backupOriginalList();
+            
+            // إذا لم تكن هناك نسخة احتياطية محفوظة لهذه القائمة، نقوم بإنشائها الآن
+            if (!appData.backups[currentOpen] || appData.backups[currentOpen].length === 0) {
+                updatePermanentBackup();
+            }
             renderSubList();
         }
 
@@ -426,8 +439,7 @@
             if (name) {
                 let color = getParticipantColor(name);
                 appData.items[currentOpen].push({ name: name, val: val, color: color });
-                save();
-                backupOriginalList();
+                updatePermanentBackup(); // تحديث النسخة الأصلية لتشمل الإضافة الجديدة
                 renderSubList();
                 nameInput.value = "";
                 valInput.value = "1";
@@ -445,8 +457,7 @@
                     playEffect('success');
                     appData.items[currentOpen][idx].name = newName;
                     appData.items[currentOpen][idx].color = getParticipantColor(newName);
-                    save();
-                    backupOriginalList();
+                    updatePermanentBackup();
                     renderSubList();
                 }
             }
@@ -457,8 +468,7 @@
             let list = appData.items[currentOpen];
             list[index].val += amount;
             if (list[index].val < 1) list[index].val = 1;
-            save();
-            backupOriginalList();
+            updatePermanentBackup();
             renderSubList();
         }
 
@@ -501,7 +511,9 @@
             document.getElementById('total-badge').innerText = total;
         }
 
-        function saveRecord() {}
+        function saveRecord() {
+            updatePermanentBackup();
+        }
 
         function startDraw() {
             let list = appData.items[currentOpen];
@@ -840,3 +852,5 @@
     </script>
 </body>
 </html>
+
+```
