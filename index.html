@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -136,6 +135,9 @@
 
             <div class="participants-scroll" id="sub-list-container"></div>
 
+            <!-- زر الاستعادة الفورية المباشر داخل شاشة التفاصيل -->
+            <button class="btn-main" style="background:#b8860b; color:#fff5cc; border-color:#8b6508; padding: 10px; font-size: 15px; margin-top: 5px;" onclick="forceRestoreOriginal()">🔄 إعادة الأسماء كما كانت</button>
+
             <div class="buttons-row">
                 <button class="btn-main btn-draw" onclick="playEffect('start'); startDraw()">🎯 سحب سريع</button>
                 <button class="btn-main btn-draw" style="background:#b8860b; border-color:#8b6508 !important;" onclick="playEffect('start'); startRoulette()">🎡 روليت العجلة</button>
@@ -272,7 +274,6 @@
             }
         }
 
-        // هيكل البيانات يتضمن الحفظ الدائم للنسخة الأصلية backups
         let appData = JSON.parse(localStorage.getItem('pureAppData')) || { items: {}, backups: {} };
         if (!appData.backups) appData.backups = {};
 
@@ -347,7 +348,7 @@
         function promptWheelReset() {
             playEffect('click');
             isWheelResetAction = true;
-            document.getElementById('delete-msg').innerText = `إعادة تعيين العجلة واستعادة الأسماء (140 اسم) كما كانت؟`;
+            document.getElementById('delete-msg').innerText = `هل تريد إعادة الأسماء كما كانت؟`;
             document.getElementById('delete-modal').style.display = 'flex';
         }
 
@@ -381,15 +382,28 @@
             closeDeleteModal();
         }
 
-        // تحديث النسخة الاحتياطية الدائمة عندما يقوم المستخدم بتثبيت الـ 140 اسم
         function updatePermanentBackup() {
             let list = appData.items[currentOpen] || [];
-            appData.backups[currentOpen] = JSON.parse(JSON.stringify(list));
-            save();
+            if (!appData.backups[currentOpen] || list.length >= appData.backups[currentOpen].length) {
+                appData.backups[currentOpen] = JSON.parse(JSON.stringify(list));
+                save();
+            }
+        }
+
+        function forceRestoreOriginal() {
+            if (appData.backups[currentOpen] && appData.backups[currentOpen].length > 0) {
+                playEffect('success');
+                appData.items[currentOpen] = JSON.parse(JSON.stringify(appData.backups[currentOpen]));
+                save();
+                renderSubList();
+                alert("تم إعادة الأسماء كما كانت بنجاح!");
+            } else {
+                alert("عذراً، لا توجد نسخة احتياطية سابقة مسجلة لهذه القائمة.");
+            }
         }
 
         function resetOriginalList() {
-            if (appData.backups[currentOpen]) {
+            if (appData.backups[currentOpen] && appData.backups[currentOpen].length > 0) {
                 appData.items[currentOpen] = JSON.parse(JSON.stringify(appData.backups[currentOpen]));
                 save();
                 renderSubList();
@@ -402,9 +416,9 @@
             document.getElementById('home-screen').style.display = 'none';
             document.getElementById('details-screen').style.display = 'flex';
             
-            // إذا لم تكن هناك نسخة احتياطية محفوظة لهذه القائمة، نقوم بإنشائها الآن
             if (!appData.backups[currentOpen] || appData.backups[currentOpen].length === 0) {
-                updatePermanentBackup();
+                appData.backups[currentOpen] = JSON.parse(JSON.stringify(appData.items[currentOpen] || []));
+                save();
             }
             renderSubList();
         }
@@ -433,7 +447,7 @@
             if (name) {
                 let color = getParticipantColor(name);
                 appData.items[currentOpen].push({ name: name, val: val, color: color });
-                updatePermanentBackup(); // تحديث النسخة الأصلية لتشمل الإضافة الجديدة
+                updatePermanentBackup();
                 renderSubList();
                 nameInput.value = "";
                 valInput.value = "1";
@@ -507,6 +521,7 @@
 
         function saveRecord() {
             updatePermanentBackup();
+            alert("تم حفظ النسخة الحالية كقائمة أساسية بنجاح!");
         }
 
         function startDraw() {
@@ -846,5 +861,3 @@
     </script>
 </body>
 </html>
-
-```
