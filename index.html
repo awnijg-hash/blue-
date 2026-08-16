@@ -33,16 +33,16 @@
         
         .participants-scroll { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-top: 5px; }
         
-        .participant-card-mobile { background: #fff5cc; border: 2px solid #7c5d12; border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; position: relative; }
+        .participant-card-mobile { border: 2px solid #7c5d12; border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; position: relative; }
         .p-top-row { display: flex; justify-content: space-between; align-items: center; padding-left: 20px; }
         .p-name { font-size: 16px; font-weight: bold; color: #3b2c0d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; flex: 1; }
         
         .p-delete-text-btn { position: absolute; top: 4px; left: 6px; background: none; border: none; color: #a83232; font-size: 18px; font-weight: 900; cursor: pointer; padding: 0; line-height: 1; }
 
-        .p-bottom-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed #d4af37; padding-top: 4px; }
+        .p-bottom-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed rgba(0,0,0,0.2); padding-top: 4px; }
         .p-shares-box { background: #fff; color: #3b2c0d; padding: 2px 10px; border-radius: 6px; font-weight: bold; font-size: 15px; min-width: 45px; text-align: center; border: 2px solid #7c5d12; }
         .p-arrows { display: flex; gap: 4px; }
-        .arrow-btn { background: #e6be4a; color: #3b2c0d; border: 1px solid #7c5d12; border-radius: 4px; width: 28px; height: 22px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+        .arrow-btn { background: rgba(255,255,255,0.6); color: #3b2c0d; border: 1px solid #7c5d12; border-radius: 4px; width: 28px; height: 22px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
         
         .btn-draw { background: #4a287a; color: #fff; border: 2px solid #281442 !important; width: 48%; font-size: 16px; padding: 12px; border-radius: 8px !important; }
         .buttons-row { display: flex; gap: 4px; margin-top: 5px; }
@@ -73,11 +73,14 @@
         .roulette-transform-container { position: absolute; display: flex; justify-content: center; align-items: center; cursor: grab; }
         .roulette-transform-container:active { cursor: grabbing; }
 
-        canvas { border-radius: 50%; border: 4px solid #d4af37; box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); background: #fff5cc; width: 1200px; height: 1200px; }
-        .roulette-pointer { position: absolute; top: -10px; width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 24px solid #ff3333; z-index: 230; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); pointer-events: none; }
+        canvas { border-radius: 50%; box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); background: #fff5cc; width: 1200px; height: 1200px; }
         
-        #winner-banner { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(43, 33, 0, 0.95); border: 3px solid #d4af37; border-radius: 14px; padding: 20px 25px; z-index: 240; text-align: center; box-shadow: 0 0 30px rgba(212,175,55,0.7); max-width: 90%; animation: popIn 0.3s ease-out; }
-        @keyframes popIn { from { transform: translate(-50%, -50%) scale(0.7); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+        /* مؤشر العجلة ملاصق تماماً بدون إطار أبيض ومكتوب فوقه الاسم بوضوح */
+        .roulette-pointer-container { position: absolute; top: -5px; display: flex; flex-direction: column; align-items: center; z-index: 230; pointer-events: none; width: 100%; }
+        .roulette-pointer { width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 26px solid #ff3333; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.7)); }
+        
+        #winner-banner { display: none; position: absolute; top: 12%; left: 50%; transform: translate(-50%, 0); background: rgba(43, 33, 0, 0.95); border: 3px solid #d4af37; border-radius: 12px; padding: 10px 20px; z-index: 240; text-align: center; box-shadow: 0 0 25px rgba(212,175,55,0.8); max-width: 90%; animation: popIn 0.2s ease-out; }
+        @keyframes popIn { from { transform: translate(-50%, 0) scale(0.7); opacity: 0; } to { transform: translate(-50%, 0) scale(1); opacity: 1; } }
 
         .delete-modal-box { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(43, 33, 0, 0.85); z-index: 300; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
         .delete-modal-card { background: linear-gradient(145deg, #fde48e 0%, #d4af37 100%); border: 3px solid #573f06; padding: 20px; border-radius: 12px; width: 100%; max-width: 320px; position: relative; gap: 12px; display: flex; flex-direction: column; }
@@ -167,13 +170,15 @@
             </div>
 
             <div class="roulette-viewport" id="rouletteViewport">
-                <div class="roulette-transform-container" id="transformContainer">
+                <div class="roulette-pointer-container">
                     <div class="roulette-pointer"></div>
+                </div>
+                <div class="roulette-transform-container" id="transformContainer">
                     <canvas id="wheelCanvas" width="1200" height="1200"></canvas>
                 </div>
                 <div id="winner-banner">
-                    <div style="color: #d4af37; font-size: 14px; margin-bottom: 4px;">🎉 الفائز في المنتصف 🎉</div>
-                    <div id="winnerNameText" style="color: #fff; font-size: 24px; font-weight: 900; word-break: break-word;"></div>
+                    <div style="color: #d4af37; font-size: 13px; margin-bottom: 2px;">🎉 الفائز فوق المؤشر 🎉</div>
+                    <div id="winnerNameText" style="color: #fff; font-size: 26px; font-weight: 900; word-break: break-word;"></div>
                 </div>
             </div>
             
@@ -230,11 +235,6 @@
                     gain.gain.exponentialRampToValueAtTime(0.001, now + (index * 0.05) + 0.12);
                     osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now + (index * 0.05)); osc.stop(now + (index * 0.05) + 0.12);
                 });
-            } else if (type === 'tick') {
-                let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
-                osc.type = 'sine'; osc.frequency.setValueAtTime(1400, now); osc.frequency.exponentialRampToValueAtTime(500, now + 0.025);
-                gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
-                osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.025);
             }
         }
 
@@ -355,13 +355,24 @@
             renderList();
         }
 
+        function getParticipantColor(name) {
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) {
+                hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            let c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
+            let hex = '#' + ('00000'.substring(0, 6 - c.length) + c);
+            return hex;
+        }
+
         function addSubItem() {
             let nameInput = document.getElementById('sub-item-name');
             let valInput = document.getElementById('sub-item-val');
             let name = nameInput.value.trim();
             let val = parseInt(valInput.value) || 1;
             if (name) {
-                appData.items[currentOpen].push({ name: name, val: val });
+                let color = getParticipantColor(name);
+                appData.items[currentOpen].push({ name: name, val: val, color: color });
                 save();
                 renderSubList();
                 nameInput.value = "";
@@ -379,6 +390,7 @@
                 if (newName !== "") {
                     playEffect('success');
                     appData.items[currentOpen][idx].name = newName;
+                    appData.items[currentOpen][idx].color = getParticipantColor(newName);
                     save();
                     renderSubList();
                 }
@@ -402,15 +414,27 @@
 
             list.forEach((item, idx) => {
                 total += item.val;
+                if (!item.color) item.color = getParticipantColor(item.name);
+                
                 let card = document.createElement('div');
                 card.className = 'participant-card-mobile';
+                card.style.backgroundColor = item.color;
+                
+                // تحديد لون النص تلقائياً (فاتح أو غامق) بناءً على لون الخلفية لضمان الوضوح
+                let r = parseInt(item.color.substr(1,2),16);
+                let g = parseInt(item.color.substr(3,2),16);
+                let b = parseInt(item.color.substr(5,2),16);
+                let yiq = ((r*299)+(g*587)+(b*114))/1000;
+                let textColor = (yiq >= 128) ? '#2c2200' : '#ffffff';
+                card.style.color = textColor;
+
                 card.innerHTML = `
-                    <button class="p-delete-text-btn" onclick="promptSubDelete(${idx})">×</button>
+                    <button class="p-delete-text-btn" style="color: ${textColor};" onclick="promptSubDelete(${idx})">×</button>
                     <div class="p-top-row">
                         <div class="p-name" onclick="editSubItemName(${idx})" title="اضغط لتعديل الاسم">${idx + 1}. ${item.name}</div>
                     </div>
                     <div class="p-bottom-row">
-                        <div class="p-shares-box">${item.val}</div>
+                        <div class="p-shares-box" style="color: #2c2200;">${item.val}</div>
                         <div class="p-arrows">
                             <button class="arrow-btn" onclick="modifyVal(${idx}, 1)">▲</button>
                             <button class="arrow-btn" onclick="modifyVal(${idx}, -1)">▼</button>
@@ -444,7 +468,7 @@
             if (drawIndex > 0) {
                 let currentName = drawPool[drawIndex - 1];
                 box.innerHTML = `
-                    <div style="font-size: 80px; font-weight: 900; color: #7c5d12; line-height: 1; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">${drawIndex}</div>
+                    <div style="font-size: 80px; font-weight: 900; color: #7c5d12; line-height: 1;">${drawIndex}</div>
                     <div style="font-size: 36px; font-weight: bold; color: #3b2c0d; word-break: break-word; padding: 0 10px;">${currentName}</div>
                 `;
             } else {
@@ -489,8 +513,9 @@
             if (!list) return;
             currentRoulettePool = [];
             list.forEach(item => {
+                if (!item.color) item.color = getParticipantColor(item.name);
                 for(let i = 0; i < item.val; i++) {
-                    currentRoulettePool.push({ name: item.name });
+                    currentRoulettePool.push({ name: item.name, color: item.color });
                 }
             });
             currentRoulettePool.sort(() => Math.random() - 0.5);
@@ -567,16 +592,6 @@
             drawWheel(wheelAngle);
         }
 
-        function getParticipantColor(name, index) {
-            let hash = 0;
-            for (let i = 0; i < name.length; i++) {
-                hash = name.charCodeAt(i) + ((hash << 5) - hash);
-            }
-            let c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
-            let color = '#' + ('00000'.substring(0, 6 - c.length) + c);
-            return color;
-        }
-
         function drawWheel(angle) {
             const canvas = document.getElementById('wheelCanvas');
             const ctx = canvas.getContext('2d');
@@ -584,7 +599,7 @@
             const height = canvas.height;
             const centerX = width / 2;
             const centerY = height / 2;
-            const radius = Math.min(centerX, centerY) - 40;
+            const radius = Math.min(centerX, centerY) - 10;
 
             ctx.clearRect(0, 0, width, height);
 
@@ -597,9 +612,6 @@
                 ctx.beginPath();
                 ctx.arc(0, 0, radius, 0, 2 * Math.PI);
                 ctx.fill();
-                ctx.lineWidth = 10;
-                ctx.strokeStyle = '#d4af37';
-                ctx.stroke();
                 ctx.fillStyle = '#3b2c0d';
                 ctx.font = 'bold 40px Segoe UI';
                 ctx.textAlign = 'center';
@@ -624,10 +636,10 @@
                 ctx.arc(0, 0, radius, startAngle, endAngle);
                 ctx.closePath();
 
-                let colors = ['#fce07d', '#dfb743', '#e6be4a', '#aa771c', '#d4af37', '#fde48e'];
-                ctx.fillStyle = colors[i % colors.length];
+                // استخدام اللون الخاص بكل مشترك مباشرة في خانة العجلة
+                ctx.fillStyle = currentRoulettePool[i].color || '#d4af37';
                 ctx.fill();
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 2;
                 ctx.strokeStyle = '#573f06';
                 ctx.stroke();
 
@@ -635,7 +647,14 @@
                 ctx.rotate(startAngle + sliceAngle / 2);
                 ctx.textAlign = 'right';
                 ctx.textBaseline = 'middle';
-                ctx.fillStyle = '#2b2100';
+                
+                // تحديد لون خط النص حسب لون خلفية القطع لضمان الوضوح
+                let colHex = currentRoulettePool[i].color || '#d4af37';
+                let r = parseInt(colHex.substr(1,2),16);
+                let g = parseInt(colHex.substr(3,2),16);
+                let b = parseInt(colHex.substr(5,2),16);
+                let yiq = ((r*299)+(g*587)+(b*114))/1000;
+                ctx.fillStyle = (yiq >= 128) ? '#2b2100' : '#ffffff';
                 
                 let fontSize = Math.max(16, Math.min(40, Math.floor(400 / totalItems)));
                 ctx.font = `bold ${fontSize}px Segoe UI`;
@@ -647,10 +666,10 @@
             }
 
             ctx.beginPath();
-            ctx.arc(0, 0, 60, 0, 2 * Math.PI);
+            ctx.arc(0, 0, 50, 0, 2 * Math.PI);
             ctx.fillStyle = '#2b2100';
             ctx.fill();
-            ctx.lineWidth = 6;
+            ctx.lineWidth = 4;
             ctx.strokeStyle = '#d4af37';
             ctx.stroke();
 
