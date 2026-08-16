@@ -1,3 +1,12 @@
+حقك علي تماماً، تفضل هذا هو **الكود الكامل والنهائي** بدون أي نقص، ويشمل التعديلات التالية:
+
+1. **ألوان المشتركين متطابقة:** أصبحت بطاقات المشتركين في القائمة تحمل نفس ألوان أقسامهم على العجلة، مع جعل الخط أبيض وواضح تماماً.
+2. **إزالة حدود العجلة البيضاء:** أصبحت العجلة مرسومة بسلاسة بدون أي إطار أو خط أبيض محيط بها.
+3. **تزامن الدوران الصحيح:** العجلة تلف طوال المدة المحددة بالضبط (سواء 3 ثوانٍ أو أكثر) وتتوقف وظهر اسم الفائز فور انتهاء الوقت تماماً.
+
+إليك الكود كاملاً وجاهزاً للنسخ:
+
+```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -6,141 +15,695 @@
     <title>منصة الإضافات التفاعلية</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #2b2100; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
-        .mobile-frame { width: 100%; max-width: 430px; height: 100vh; max-height: 900px; background: #d4af37; display: flex; flex-direction: column; position: relative; overflow: hidden; border: 2px solid #573f06; }
+        body { background-color: #2b2100; color: #2c2200; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .mobile-frame { width: 100%; max-width: 430px; height: 100vh; max-height: 900px; background: linear-gradient(135deg, #fce07d 0%, #d4af37 50%, #aa771c 100%); display: flex; flex-direction: column; position: relative; overflow: hidden; border: 2px solid #573f06; box-shadow: 0 0 20px rgba(0,0,0,0.6); }
+
         #home-screen { flex: 1; background: linear-gradient(145deg, #fde48e 0%, #e6be4ae0 100%); display: flex; flex-direction: column; padding: 20px; overflow-y: auto; }
         .screen-header { font-size: 24px; font-weight: bold; text-align: center; color: #3b2c0d; margin-bottom: 20px; }
-        .btn-main { background: #fff3c4; color: #3b2c0d; font-weight: bold; padding: 14px; border-radius: 8px; border: 2px solid #7c5d12; font-size: 18px; cursor: pointer; text-align: center; margin-bottom: 15px; }
+        .btn-main { background: #fff3c4; color: #3b2c0d; font-weight: bold; padding: 14px; border-radius: 8px; border: 2px solid #7c5d12; font-size: 18px; cursor: pointer; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        
         .add-box { background: #fce89c; border: 2px solid #7c5d12; border-radius: 8px; padding: 12px; margin-bottom: 15px; display: none; flex-direction: column; gap: 8px; }
-        .add-box input { width: 100%; padding: 10px; border-radius: 6px; border: 2px solid #7c5d12; background: #fff5cc; font-size: 16px; font-weight: bold; }
-        .list-item { background: #fff5cc; border: 2px solid #7c5d12; border-radius: 8px; padding: 15px; font-size: 20px; font-weight: bold; text-align: center; cursor: pointer; color: #3b2c0d; margin-bottom: 10px; position: relative; }
-        .delete-btn { position: absolute; top: 6px; left: 8px; background: #a83232; color: #fff; border-radius: 50%; width: 26px; height: 26px; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .add-box input { width: 100%; padding: 10px; border-radius: 6px; border: 2px solid #7c5d12; background: #fff5cc; color: #3b2c0d; font-size: 16px; font-weight: bold; }
         
-        #details-screen { display: none; flex: 1; background: #fde48e; flex-direction: column; padding: 12px; }
-        .participants-scroll { flex: 1; overflow-y: auto; gap: 10px; display: flex; flex-direction: column; }
-        .participant-card-mobile { border-radius: 8px; padding: 10px; color: #ffffff; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .list-container { display: flex; flex-direction: column; gap: 12px; flex: 1; overflow-y: auto; }
+        .list-item { background: #fff5cc; border: 2px solid #7c5d12; border-radius: 8px; padding: 15px; font-size: 20px; font-weight: bold; text-align: center; cursor: pointer; color: #3b2c0d; position: relative; }
+        .delete-btn { position: absolute; top: 6px; left: 8px; background: #a83232; color: #fff; border: 1px solid #5c1818; width: 26px; height: 26px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+        #details-screen { display: none; flex: 1; background: linear-gradient(145deg, #fde48e 0%, #dfb743 100%); flex-direction: column; padding: 12px; overflow: hidden; position: relative; }
+        .details-top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 5px; }
+        .back-group { display: flex; align-items: center; gap: 6px; }
+        .back-btn { background: #a83232; color: #fff; border: 2px solid #5c1818; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .total-badge { background: #fff3c4; color: #3b2c0d; border: 2px solid #7c5d12; padding: 5px 8px; border-radius: 6px; font-size: 13px; font-weight: bold; text-align: center; }
+        .comp-title-display { font-size: 16px; font-weight: bold; color: #3b2c0d; text-align: center; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .action-row { display: flex; gap: 6px; }
+        .action-row input { flex: 1; padding: 8px; border-radius: 6px; border: 2px solid #7c5d12; background: #fff5cc; color: #3b2c0d; font-size: 16px; font-weight: bold; }
+        .btn-add { background: #235c36; color: #fff; padding: 8px 12px; border-radius: 6px; border: 2px solid #11301c; cursor: pointer; font-weight: bold; }
         
-        #roulette-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #2b2100; z-index: 200; flex-direction: column; padding: 10px; }
-        .roulette-viewport { flex: 1; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; }
-        canvas { width: 100%; max-width: 400px; height: 400px; }
-        .roulette-pointer { position: absolute; top: 10px; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid #ff3333; z-index: 230; }
-        #winner-banner { display: none; position: absolute; top: 50px; width: 90%; background: rgba(0,0,0,0.8); color: #ffeb3b; padding: 15px; border-radius: 10px; text-align: center; z-index: 250; font-size: 24px; font-weight: bold; }
+        .participants-scroll { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-top: 5px; }
+        
+        /* بطاقة المشترك بلون العجلة والخط الأبيض */
+        .participant-card-mobile { border: 2px solid #2b2100; border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .p-top-row { display: flex; justify-content: space-between; align-items: center; padding-left: 20px; }
+        .p-name { font-size: 16px; font-weight: bold; color: #ffffff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; flex: 1; text-shadow: 1px 1px 2px rgba(0,0,0,0.6); }
+        
+        .p-delete-text-btn { position: absolute; top: 4px; left: 6px; background: rgba(0,0,0,0.3); border: none; color: #ffcccc; font-size: 18px; font-weight: 900; cursor: pointer; padding: 0 6px; border-radius: 4px; line-height: 1; }
+
+        .p-bottom-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed rgba(255,255,255,0.5); padding-top: 4px; }
+        .p-shares-box { background: rgba(0,0,0,0.3); color: #ffffff; padding: 2px 10px; border-radius: 6px; font-weight: bold; font-size: 15px; min-width: 45px; text-align: center; border: 1px solid rgba(255,255,255,0.4); }
+        .p-arrows { display: flex; gap: 4px; }
+        .arrow-btn { background: rgba(255,255,255,0.9); color: #3b2c0d; border: 1px solid #7c5d12; border-radius: 4px; width: 28px; height: 22px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+        
+        .btn-draw { background: #4a287a; color: #fff; border: 2px solid #281442 !important; width: 48%; font-size: 16px; padding: 12px; border-radius: 8px !important; }
+        .buttons-row { display: flex; gap: 4px; margin-top: 5px; }
+
+        /* نافذة السحب العادي */
+        .internal-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #fce07d 0%, #d4af37 50%, #aa771c 100%); z-index: 100; flex-direction: column; justify-content: space-between; align-items: center; padding: 25px 15px; text-align: center; border: 2px solid #573f06; }
+        .close-x-btn { position: absolute; top: 10px; left: 15px; background: #a83232; color: #fff; border: 2px solid #5c1818; width: 35px; height: 35px; border-radius: 50%; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 250; }
+        #roll-box { width: 100%; flex: 1; margin: 45px 0 15px 0; padding: 20px; background: #fff5cc; border-radius: 12px; border: 3px solid #7c5d12; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; box-shadow: inset 0 0 15px rgba(0,0,0,0.1); }
+        .step-draw-btn { background: #4a287a; color: #fff; border: 2px solid #281442; padding: 16px; font-size: 32px; font-weight: bold; border-radius: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+
+        /* نافذة روليت العجلة المطورة */
+        #roulette-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #2b2100 0%, #573f06 100%); z-index: 200; flex-direction: column; justify-content: flex-start; align-items: center; padding: 8px; text-align: center; overflow: hidden; }
+        
+        .roulette-header-fixed { width: 100%; display: flex; flex-direction: column; gap: 4px; z-index: 220; flex-shrink: 0; margin-top: 15px; }
+        
+        .roulette-controls { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid #d4af37; border-radius: 8px; padding: 6px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px; text-align: right; }
+        .control-group { display: flex; align-items: center; gap: 5px; color: #fff5cc; font-size: 12px; font-weight: bold; }
+        .control-group input[type="range"] { width: 100px; accent-color: #d4af37; }
+        .control-group input[type="checkbox"] { width: 15px; height: 15px; accent-color: #235c36; cursor: pointer; }
+        .btn-shuffle { background: #b8860b; color: #fff; border: 1px solid #8b6508; padding: 3px 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; }
+        
+        .roulette-sub-actions { display: flex; gap: 6px; width: 100%; justify-content: center; }
+        .wheel-action-btn { background: #b8860b; color: #fff5cc; border: 1px solid #d4af37; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        .wheel-action-btn:active { background: #8b6508; }
+
+        .roulette-viewport { width: 100%; flex: 1; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px dashed #d4af37; margin-top: 4px; touch-action: none; }
+        
+        .roulette-transform-container { position: absolute; display: flex; justify-content: center; align-items: center; cursor: grab; }
+        .roulette-transform-container:active { cursor: grabbing; }
+
+        canvas { border-radius: 50%; box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); background: #fff5cc; width: 1200px; height: 1200px; }
+        .roulette-pointer { position: absolute; top: 15px; width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 24px solid #ff3333; z-index: 230; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); pointer-events: none; }
+        
+        #winner-banner { display: none; position: absolute; top: 3px; left: 50%; transform: translateX(-50%); background: rgba(43, 33, 0, 0.92); border: 2px solid #d4af37; border-radius: 8px; padding: 2px 12px; z-index: 240; text-align: center; box-shadow: 0 0 15px rgba(212,175,55,0.7); max-width: 95%; animation: popIn 0.3s ease-out; }
+        .winner-content-wrap { display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .celebration-deco { font-size: 18px; animation: bounceDeco 0.6s infinite alternate; }
+        @keyframes bounceDeco { from { transform: translateY(0); } to { transform: translateY(-3px); } }
+        @keyframes popIn { from { transform: translateX(-50%) scale(0.7); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
+
+        .delete-modal-box { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(43, 33, 0, 0.85); z-index: 300; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
+        .delete-modal-card { background: linear-gradient(145deg, #fde48e 0%, #d4af37 100%); border: 3px solid #573f06; padding: 20px; border-radius: 12px; width: 100%; max-width: 320px; position: relative; gap: 12px; display: flex; flex-direction: column; }
     </style>
 </head>
-<body>
+<body onclick="goFullScreen()">
+
     <div class="mobile-frame">
+        <!-- القائمة الرئيسية -->
         <div id="home-screen">
             <div class="screen-header">القائمة الرئيسية</div>
-            <button class="btn-main" onclick="toggleAddBox('add-main-container')">+ إضافة جديد</button>
+            <button class="btn-main" onclick="playEffect('click'); toggleAddBox('add-main-container')">+ إضافة جديد</button>
+            
             <div id="add-main-container" class="add-box">
                 <input type="text" id="new-item-name" placeholder="اكتب الاسم هنا...">
-                <button class="btn-main" onclick="addNewItem()">حفظ</button>
+                <button class="btn-add" onclick="addNewItem()">حفظ</button>
             </div>
-            <div id="list-container"></div>
+            
+            <div class="list-container" id="list-container"></div>
         </div>
 
+        <!-- نافذة التفاصيل والتحكم بالعناصر -->
         <div id="details-screen">
-            <button class="btn-main" onclick="startRoulette()">🎡 روليت العجلة</button>
+            <div class="details-top-bar">
+                <button class="btn-add" onclick="playEffect('success'); saveRecord()">حفظ</button>
+                <div class="comp-title-display" id="active-title">الاسم</div>
+                <div class="back-group">
+                    <div class="total-badge" id="total-badge" title="العدد الكلي">0</div>
+                    <button class="back-btn" onclick="playEffect('click'); goBackHome()">رجوع</button>
+                </div>
+            </div>
+
+            <button class="btn-main" style="padding: 10px; font-size: 15px; margin-bottom: 5px;" onclick="playEffect('click'); toggleAddBox('add-sub-container')">+ إضافة جديد</button>
+            
+            <div id="add-sub-container" class="add-box">
+                <div class="action-row">
+                    <input type="text" id="sub-item-name" placeholder="اسم العنصر...">
+                </div>
+                <div class="action-row">
+                    <input type="number" id="sub-item-val" value="1" min="1" placeholder="العدد">
+                    <button class="btn-add" onclick="playEffect('success'); addSubItem()">تأكيد</button>
+                </div>
+            </div>
+
             <div class="participants-scroll" id="sub-list-container"></div>
-            <button class="btn-main" onclick="goBackHome()">رجوع</button>
+
+            <div class="buttons-row">
+                <button class="btn-main btn-draw" onclick="playEffect('start'); startDraw()">🎯 سحب سريع</button>
+                <button class="btn-main btn-draw" style="background:#b8860b; border-color:#8b6508 !important;" onclick="playEffect('start'); startRoulette()">🎡 روليت العجلة</button>
+            </div>
         </div>
 
-        <div id="roulette-modal">
-            <div class="roulette-pointer"></div>
-            <div id="winner-banner"></div>
-            <div class="roulette-viewport">
-                <canvas id="wheelCanvas" width="800" height="800"></canvas>
+        <!-- نافذة السحب السريع -->
+        <div id="draw-modal" class="internal-modal">
+            <button class="close-x-btn" onclick="playEffect('click'); closeDrawModal()">×</button>
+            <div id="roll-box">جاهز للاختيار...</div>
+            <div style="width: 100%; display: flex; flex-direction: column; gap: 10px;">
+                <button class="step-draw-btn" onclick="playEffect('step'); nextStepDraw()">⬇ التالي</button>
+                <button class="btn-add" style="width:100%; padding: 12px; font-size: 18px; background:#235c36; border: 2px solid #11301c;" onclick="playEffect('click'); resetDrawModal()">إعادة السحب</button>
             </div>
-            <input type="range" id="spinDurationRange" min="1" max="10" value="3" style="width:100%">
-            <button class="btn-main" onclick="spinWheel()">دوران</button>
-            <button class="btn-main" onclick="closeRouletteModal()">إغلاق</button>
+        </div>
+
+        <!-- نافذة روليت العجلة المطورة -->
+        <div id="roulette-modal">
+            <button class="close-x-btn" onclick="playEffect('click'); closeRouletteModal()">×</button>
+            
+            <div class="roulette-header-fixed">
+                <div style="color: #fce07d; font-size: 15px; font-weight: bold;">عجلة الحظ التفاعلية</div>
+                
+                <div class="roulette-controls">
+                    <div class="control-group">
+                        <span>المدة:</span>
+                        <input type="range" id="spinDurationRange" min="1" max="20" value="5" oninput="updateSpinTimeText(this.value)">
+                        <span id="spinTimeVal">5</span>ث
+                    </div>
+                    <div class="control-group">
+                        <span>حذف الفائز:</span>
+                        <input type="checkbox" id="removeWinnerCheck" checked>
+                    </div>
+                    <button class="btn-shuffle" onclick="playEffect('click'); shuffleRouletteItems()">🔀 خلط</button>
+                </div>
+
+                <div class="roulette-sub-actions">
+                    <button class="wheel-action-btn" onclick="promptWheelReset()">🔄 إعادة تعيين</button>
+                    <button class="wheel-action-btn" onclick="playEffect('click'); goToNamesScreen()">👥 الأسماء</button>
+                </div>
+            </div>
+
+            <div class="roulette-viewport" id="rouletteViewport">
+                <div id="winner-banner">
+                    <div class="winner-content-wrap">
+                        <span class="celebration-deco">🎊</span>
+                        <span id="winnerNameText" style="color: #ffeb3b; font-size: 20px; font-weight: 900; word-break: break-word;"></span>
+                        <span class="celebration-deco">🎉</span>
+                    </div>
+                </div>
+
+                <div class="roulette-transform-container" id="transformContainer">
+                    <div class="roulette-pointer"></div>
+                    <canvas id="wheelCanvas" width="1200" height="1200"></canvas>
+                </div>
+            </div>
+            
+            <button class="btn-add" style="width:100%; padding: 10px; font-size: 16px; background:#b8860b; border: 2px solid #8b6508; flex-shrink:0;" onclick="spinWheel()">🎲 دور الشاشة الآن</button>
+        </div>
+
+        <!-- نافذة تأكيد الحذف / إعادة التعيين -->
+        <div id="delete-modal" class="delete-modal-box">
+            <div class="delete-modal-card">
+                <h3>تأكيد</h3>
+                <p id="delete-msg" style="font-weight:bold;"></p>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-add" style="background:#a83232; flex:1;" onclick="executeModalAction()">نعم</button>
+                    <button class="btn-add" style="background:#235c36; flex:1;" onclick="closeDeleteModal()">إلغاء</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
+        function goFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            }
+        }
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playEffect(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            let now = audioCtx.currentTime;
+            if (type === 'click') {
+                let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+                osc.frequency.setValueAtTime(900, now); osc.frequency.setValueAtTime(500, now + 0.04);
+                gain.gain.setValueAtTime(0.15, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+                osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.04);
+            } else if (type === 'step') {
+                let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(400, now); osc.frequency.exponentialRampToValueAtTime(150, now + 0.08);
+                gain.gain.setValueAtTime(0.25, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+                osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.08);
+            } else if (type === 'success') {
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, index) => {
+                    let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+                    osc.frequency.setValueAtTime(freq, now + (index * 0.08));
+                    gain.gain.setValueAtTime(0.2, now + (index * 0.08));
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + (index * 0.08) + 0.2);
+                    osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now + (index * 0.08)); osc.stop(now + (index * 0.08) + 0.2);
+                });
+            } else if (type === 'start') {
+                [350, 550, 750, 950].forEach((freq, index) => {
+                    let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+                    osc.type = 'square'; osc.frequency.setValueAtTime(freq, now + (index * 0.05));
+                    gain.gain.setValueAtTime(0.12, now + (index * 0.05));
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + (index * 0.05) + 0.12);
+                    osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now + (index * 0.05)); osc.stop(now + (index * 0.05) + 0.12);
+                });
+            } else if (type === 'tick') {
+                let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+                osc.type = 'sine'; osc.frequency.setValueAtTime(1400, now); osc.frequency.exponentialRampToValueAtTime(500, now + 0.025);
+                gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+                osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.025);
+            }
+        }
+
         let appData = JSON.parse(localStorage.getItem('pureAppData')) || { items: {} };
         let currentOpen = "";
-        let wheelAngle = 0;
-        let isSpinning = false;
-        let currentRoulettePool = [];
+        let pendingDelete = null;
+        let pendingSubDelete = null;
+        let isWheelResetAction = false;
+        let drawPool = [];
+        let drawIndex = 0;
 
-        function toggleAddBox(id) { document.getElementById(id).style.display = document.getElementById(id).style.display === 'flex' ? 'none' : 'flex'; }
-        
+        window.onload = renderList;
+
+        function save() {
+            localStorage.setItem('pureAppData', JSON.stringify(appData));
+        }
+
+        function toggleAddBox(id) {
+            let box = document.getElementById(id);
+            box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
+        }
+
         function addNewItem() {
-            let name = document.getElementById('new-item-name').value.trim();
-            if (name) { appData.items[name] = []; localStorage.setItem('pureAppData', JSON.stringify(appData)); renderList(); }
+            let input = document.getElementById('new-item-name');
+            let name = input.value.trim();
+            if (name && !appData.items[name]) {
+                playEffect('success');
+                appData.items[name] = [];
+                save();
+                renderList();
+                input.value = "";
+                toggleAddBox('add-main-container');
+            }
         }
 
         function renderList() {
-            let container = document.getElementById('list-container'); container.innerHTML = "";
-            Object.keys(appData.items).forEach(name => {
-                let div = document.createElement('div'); div.className = 'list-item';
-                div.innerHTML = name; div.onclick = () => openDetails(name); container.appendChild(div);
+            let container = document.getElementById('list-container');
+            container.innerHTML = "";
+            let keys = Object.keys(appData.items);
+            if (keys.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color:#573f06; margin-top:30px; font-size:16px;">لا توجد عناصر مسجلة.<br>اضغط فوق لإضافة جديد!</div>`;
+                return;
+            }
+            keys.forEach(name => {
+                let div = document.createElement('div');
+                div.className = 'list-item';
+                div.innerHTML = `<span>${name}</span><button class="delete-btn" onclick="event.stopPropagation(); promptDelete('${name}')">×</button>`;
+                div.onclick = () => { playEffect('click'); openDetails(name); };
+                container.appendChild(div);
             });
+        }
+
+        function promptDelete(name) {
+            playEffect('click');
+            isWheelResetAction = false;
+            pendingDelete = name;
+            pendingSubDelete = null;
+            document.getElementById('delete-msg').innerText = `حذف القائمة "${name}"؟`;
+            document.getElementById('delete-modal').style.display = 'flex';
+        }
+
+        function promptSubDelete(idx) {
+            playEffect('click');
+            isWheelResetAction = false;
+            pendingSubDelete = idx;
+            pendingDelete = null;
+            let subItemName = appData.items[currentOpen][idx].name;
+            document.getElementById('delete-msg').innerText = `حذف المشترك "${subItemName}"؟`;
+            document.getElementById('delete-modal').style.display = 'flex';
+        }
+
+        function promptWheelReset() {
+            playEffect('click');
+            isWheelResetAction = true;
+            document.getElementById('delete-msg').innerText = `إعادة تعيين العجلة واستعادة الأسماء المحذوفة؟`;
+            document.getElementById('delete-modal').style.display = 'flex';
+        }
+
+        function closeDeleteModal() {
+            playEffect('click');
+            pendingDelete = null;
+            pendingSubDelete = null;
+            isWheelResetAction = false;
+            document.getElementById('delete-modal').style.display = 'none';
+        }
+
+        function executeModalAction() {
+            if (isWheelResetAction) {
+                playEffect('success');
+                initRoulettePool();
+                document.getElementById('winner-banner').style.display = 'none';
+                drawWheel(wheelAngle);
+            } else if (pendingDelete) {
+                playEffect('success');
+                delete appData.items[pendingDelete];
+                save();
+                renderList();
+            } else if (pendingSubDelete !== null) {
+                playEffect('success');
+                appData.items[currentOpen].splice(pendingSubDelete, 1);
+                save();
+                renderSubList();
+            }
+            closeDeleteModal();
         }
 
         function openDetails(name) {
             currentOpen = name;
+            document.getElementById('active-title').innerText = name;
             document.getElementById('home-screen').style.display = 'none';
             document.getElementById('details-screen').style.display = 'flex';
+            renderSubList();
         }
 
-        function goBackHome() { document.getElementById('details-screen').style.display = 'none'; document.getElementById('home-screen').style.display = 'flex'; }
+        function goBackHome() {
+            document.getElementById('details-screen').style.display = 'none';
+            document.getElementById('home-screen').style.display = 'flex';
+            renderList();
+        }
+
+        function addSubItem() {
+            let nameInput = document.getElementById('sub-item-name');
+            let valInput = document.getElementById('sub-item-val');
+            let name = nameInput.value.trim();
+            let val = parseInt(valInput.value) || 1;
+            if (name) {
+                appData.items[currentOpen].push({ name: name, val: val });
+                save();
+                renderSubList();
+                nameInput.value = "";
+                valInput.value = "1";
+                toggleAddBox('add-sub-container');
+            }
+        }
+
+        function editSubItemName(idx) {
+            playEffect('click');
+            let currentName = appData.items[currentOpen][idx].name;
+            let newName = prompt("تعديل اسم المشترك:", currentName);
+            if (newName !== null) {
+                newName = newName.trim();
+                if (newName !== "") {
+                    playEffect('success');
+                    appData.items[currentOpen][idx].name = newName;
+                    save();
+                    renderSubList();
+                }
+            }
+        }
+
+        function modifyVal(index, amount) {
+            playEffect('step');
+            let list = appData.items[currentOpen];
+            list[index].val += amount;
+            if (list[index].val < 1) list[index].val = 1;
+            save();
+            renderSubList();
+        }
+
+        const wheelColorsPalette = [
+            "#e63946", "#457b9d", "#2a9d8f", "#e76f51", "#9b5de5", 
+            "#f15bb5", "#fee440", "#00bbf9", "#00f5d4", "#fb8500",
+            "#3a86ff", "#8338ec", "#ff006e", "#ffbe0b", "#38b000"
+        ];
+        function getParticipantColor(index) {
+            return wheelColorsPalette[index % wheelColorsPalette.length];
+        }
+
+        function renderSubList() {
+            let container = document.getElementById('sub-list-container');
+            container.innerHTML = "";
+            let list = appData.items[currentOpen] || [];
+            let total = 0;
+
+            list.forEach((item, idx) => {
+                total += item.val;
+                let cardColor = getParticipantColor(idx);
+                let card = document.createElement('div');
+                card.className = 'participant-card-mobile';
+                card.style.backgroundColor = cardColor;
+                card.innerHTML = `
+                    <button class="p-delete-text-btn" onclick="promptSubDelete(${idx})">×</button>
+                    <div class="p-top-row">
+                        <div class="p-name" onclick="editSubItemName(${idx})" title="اضغط لتعديل الاسم">${idx + 1}. ${item.name}</div>
+                    </div>
+                    <div class="p-bottom-row">
+                        <div class="p-shares-box">${item.val}</div>
+                        <div class="p-arrows">
+                            <button class="arrow-btn" onclick="modifyVal(${idx}, 1)">▲</button>
+                            <button class="arrow-btn" onclick="modifyVal(${idx}, -1)">▼</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            document.getElementById('total-badge').innerText = total;
+        }
+
+        function saveRecord() {}
+
+        function startDraw() {
+            let list = appData.items[currentOpen];
+            if (!list || list.length === 0) return;
+            drawPool = [];
+            list.forEach(item => {
+                for (let i = 0; i < item.val; i++) {
+                    drawPool.push(item.name);
+                }
+            });
+            drawPool.sort(() => Math.random() - 0.5);
+            drawIndex = drawPool.length;
+            updateRollDisplay();
+            document.getElementById('draw-modal').style.display = 'flex';
+        }
+
+        function updateRollDisplay() {
+            let box = document.getElementById('roll-box');
+            if (drawIndex > 0) {
+                let currentName = drawPool[drawIndex - 1];
+                box.innerHTML = `
+                    <div style="font-size: 80px; font-weight: 900; color: #7c5d12; line-height: 1; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">${drawIndex}</div>
+                    <div style="font-size: 36px; font-weight: bold; color: #3b2c0d; word-break: break-word; padding: 0 10px;">${currentName}</div>
+                `;
+            } else {
+                box.innerHTML = `<div style="font-size: 32px; font-weight: bold; color: #573f06;">🎉 انتهت العناصر!</div>`;
+            }
+        }
+
+        function nextStepDraw() {
+            if (drawIndex > 0) {
+                drawIndex--;
+                updateRollDisplay();
+            }
+        }
+
+        function resetDrawModal() {
+            let list = appData.items[currentOpen];
+            if (!list) return;
+            drawPool = [];
+            list.forEach(item => {
+                for (let i = 0; i < item.val; i++) {
+                    drawPool.push(item.name);
+                }
+            });
+            drawPool.sort(() => Math.random() - 0.5);
+            drawIndex = drawPool.length;
+            updateRollDisplay();
+        }
+
+        function closeDrawModal() {
+            document.getElementById('draw-modal').style.display = 'none';
+        }
+
+        let wheelAngle = 0;
+        let isSpinning = false;
+        let currentRoulettePool = [];
+        let currentZoom = 1;
+        let panX = 0;
+        let panY = 0;
+
+        function initRoulettePool() {
+            let list = appData.items[currentOpen];
+            if (!list) return;
+            currentRoulettePool = [];
+            list.forEach((item, idx) => {
+                let color = getParticipantColor(idx);
+                for(let i = 0; i < item.val; i++) {
+                    currentRoulettePool.push({ name: item.name, color: color });
+                }
+            });
+            currentRoulettePool.sort(() => Math.random() - 0.5);
+        }
+
+        function startRoulette() {
+            let list = appData.items[currentOpen];
+            if (!list || list.length === 0) return;
+            
+            initRoulettePool();
+            document.getElementById('winner-banner').style.display = 'none';
+            document.getElementById('roulette-modal').style.display = 'flex';
+            currentZoom = 1;
+            panX = 0;
+            panY = 0;
+            updateTransform();
+            drawWheel(0);
+        }
+
+        function closeRouletteModal() {
+            document.getElementById('roulette-modal').style.display = 'none';
+        }
+
+        function goToNamesScreen() {
+            closeRouletteModal();
+        }
+
+        function updateSpinTimeText(val) {
+            document.getElementById('spinTimeVal').innerText = val;
+        }
+
+        function updateTransform() {
+            let container = document.getElementById('transformContainer');
+            container.style.transform = `translate(${panX}px, ${panY}px) scale(${currentZoom})`;
+        }
+
+        let isDragging = false;
+        let startX, startY;
+        const viewport = document.getElementById('rouletteViewport');
+
+        viewport.addEventListener('pointerdown', (e) => {
+            isDragging = true;
+            startX = e.clientX - panX;
+            startY = e.clientY - panY;
+            viewport.setPointerCapture(e.pointerId);
+        });
+
+        viewport.addEventListener('pointermove', (e) => {
+            if (!isDragging) return;
+            panX = e.clientX - startX;
+            panY = e.clientY - startY;
+            updateTransform();
+        });
+
+        viewport.addEventListener('pointerup', (e) => {
+            isDragging = false;
+            viewport.releasePointerCapture(e.pointerId);
+        });
+
+        viewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            playEffect('step');
+            if (e.deltaY < 0) {
+                currentZoom = Math.min(currentZoom + 0.15, 4.0);
+            } else {
+                currentZoom = Math.max(currentZoom - 0.15, 0.5);
+            }
+            updateTransform();
+        }, { passive: false });
+
+        function shuffleRouletteItems() {
+            playEffect('click');
+            currentRoulettePool.sort(() => Math.random() - 0.5);
+            drawWheel(wheelAngle);
+        }
 
         function drawWheel(angle) {
             const canvas = document.getElementById('wheelCanvas');
             const ctx = canvas.getContext('2d');
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const radius = 350;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            let arcSize = (2 * Math.PI) / currentRoulettePool.length;
+            const width = canvas.width;
+            const height = canvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(centerX, centerY) - 30;
 
-            currentRoulettePool.forEach((item, i) => {
+            ctx.clearRect(0, 0, width, height);
+
+            let totalSlices = currentRoulettePool.length;
+            if (totalSlices === 0) return;
+
+            let arcSize = (2 * Math.PI) / totalSlices;
+
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(angle);
+
+            for (let i = 0; i < totalSlices; i++) {
+                let startAngle = i * arcSize;
+                let endAngle = (i + 1) * arcSize;
+
                 ctx.beginPath();
-                ctx.moveTo(centerX, centerY);
-                ctx.arc(centerX, centerY, radius, i * arcSize + angle, (i + 1) * arcSize + angle);
-                ctx.fillStyle = item.color;
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, radius, startAngle, endAngle);
+                ctx.closePath();
+
+                ctx.fillStyle = currentRoulettePool[i].color;
                 ctx.fill();
-                // تم حذف stroke() لإزالة الحد الأبيض
-            });
+                // بدون حدود خارجية بيضاء
+            }
+
+            ctx.restore();
+
+            // الدائرة المركزية
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 40, 0, 2 * Math.PI);
+            ctx.fillStyle = "#d4af37";
+            ctx.fill();
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = "#573f06";
+            ctx.stroke();
         }
 
         function spinWheel() {
-            if (isSpinning) return;
+            if (isSpinning || currentRoulettePool.length === 0) return;
             isSpinning = true;
+            playEffect('start');
+            document.getElementById('winner-banner').style.display = 'none';
+
             let duration = parseFloat(document.getElementById('spinDurationRange').value) * 1000;
-            let targetAngle = wheelAngle + (Math.random() * 10 + 5) * Math.PI * 2;
+            let extraRotations = 5 + Math.floor(Math.random() * 5);
+            let randomAngle = Math.random() * 2 * Math.PI;
+            let targetAngle = wheelAngle + (extraRotations * 2 * Math.PI) + randomAngle;
+
             let startTime = null;
 
-            function animate(currentTime) {
+            function animateSpin(currentTime) {
                 if (!startTime) startTime = currentTime;
-                let progress = Math.min((currentTime - startTime) / duration, 1);
+                let elapsed = currentTime - startTime;
+                let progress = Math.min(elapsed / duration, 1);
+                
                 let easeProgress = 1 - Math.pow(1 - progress, 3);
-                wheelAngle = (targetAngle * easeProgress) % (2 * Math.PI);
+                
+                wheelAngle = wheelAngle + (targetAngle - wheelAngle) * easeProgress;
                 drawWheel(wheelAngle);
-                if (progress < 1) requestAnimationFrame(animate);
-                else { isSpinning = false; determineWinner(); }
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateSpin);
+                } else {
+                    isSpinning = false;
+                    wheelAngle = targetAngle % (2 * Math.PI);
+                    determineWinner();
+                }
             }
-            requestAnimationFrame(animate);
+
+            requestAnimationFrame(animateSpin);
         }
 
         function determineWinner() {
-            let total = currentRoulettePool.length;
-            let index = Math.floor(((((-wheelAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) / (2 * Math.PI)) * total);
-            document.getElementById('winner-banner').innerText = "الفائز هو: " + currentRoulettePool[index].name;
-            document.getElementById('winner-banner').style.display = 'block';
-        }
+            let totalSlices = currentRoulettePool.length;
+            let arcSize = (2 * Math.PI) / totalSlices;
 
-        function startRoulette() {
-            currentRoulettePool = [{name: "أحمد", color: "red"}, {name: "محمد", color: "blue"}]; // مثال
-            document.getElementById('roulette-modal').style.display = 'flex';
-            drawWheel(0);
-        }
+            let normalizedAngle = (2 * Math.PI - (wheelAngle % (2 * Math.PI)) - Math.PI / 2) % (2 * Math.PI);
+            if (normalizedAngle < 0) normalizedAngle += 2 * Math.PI;
 
-        function closeRouletteModal() { document.getElementById('roulette-modal').style.display = 'none'; }
-        
-        renderList();
+            let winningIndex = Math.floor(normalizedAngle / arcSize);
+            winningIndex = (totalSlices - (winningIndex % totalSlices)) % totalSlices;
+
+            let winner = currentRoulettePool[winningIndex];
+            
+            playEffect('success');
+            let banner = document.getElementById('winner-banner');
+            document.getElementById('winnerNameText').innerText = winner.name;
+            banner.style.display = 'block';
+
+            let removeChecked = document.getElementById('removeWinnerCheck').checked;
+            if (removeChecked) {
+                currentRoulettePool.splice(winningIndex, 1);
+                setTimeout(() => {
+                    drawWheel(wheelAngle);
+                }, 1000);
+            }
+        }
     </script>
 </body>
 </html>
+
+```
