@@ -475,8 +475,7 @@
             currentRoulettePool = [];
             list.forEach(item => {
                 for(let i = 0; i < item.val; i++) {
-                    // تخزين الاسم ولونه المخصص المرتبط به مباشرة
-                    currentRoulettePool.push({ name: item.name, color: item.color });
+                    currentRoulettePool.push({ name: item.name });
                 }
             });
             currentRoulettePool.sort(() => Math.random() - 0.5);
@@ -550,13 +549,11 @@
             drawWheel(wheelAngle);
         }
 
-        // دالة توليد ألوان متباينة وثابتة لكل مشترك بناءً على اسمه
         function getParticipantColor(name, index) {
             let hash = 0;
             for (let i = 0; i < name.length; i++) {
                 hash = name.charCodeAt(i) + ((hash << 5) - hash);
             }
-            // لوحة ألوان متباينة وواضحة جداً (مجموعة مميزة من الدرجات الساطعة)
             const palette = [
                 '#FF5733', '#33FF57', '#3357FF', '#F3FF33', '#FF33F3', 
                 '#33FFF3', '#FFA533', '#A533FF', '#FF3366', '#66FF33', 
@@ -586,8 +583,6 @@
             for (let i = 0; i < total; i++) {
                 let currentAngle = i * arcSize;
                 let item = currentRoulettePool[i];
-                
-                // تعيين لون مخصص وثابت لكل مشترك لكل قطاع يخصه
                 let sliceColor = getParticipantColor(item.name, i);
 
                 ctx.beginPath();
@@ -603,7 +598,6 @@
                 if (total <= 500) {
                     ctx.save();
                     ctx.rotate(currentAngle + arcSize / 2);
-                    // تباين لون النص (أبيض أو أسود غامق) حسب سطوع لون القطاع لضمان الوضوح التام
                     ctx.fillStyle = '#000000'; 
                     let fontSize = total > 200 ? 7 : (total > 100 ? 10 : 15);
                     ctx.font = `bold ${fontSize}px sans-serif`;
@@ -628,7 +622,7 @@
             let durationSeconds = parseInt(document.getElementById('spinDurationRange').value) || 5;
             let duration = durationSeconds * 1000;
 
-            let randomSpins = 5 + durationSeconds * 2; 
+            let randomSpins = 6 + durationSeconds * 2; 
             let targetAngle = wheelAngle + (randomSpins * 2 * Math.PI) + Math.random() * (2 * Math.PI);
             let startTime = null;
             let lastTickAngle = 0;
@@ -638,7 +632,8 @@
                 let elapsed = currentTime - startTime;
                 let progress = Math.min(elapsed / duration, 1);
                 
-                let easeOut = 1 - Math.pow(1 - progress, 3);
+                // دالة تيسير حركة انسيابية وثقيلة تشبه روليت جوجل (Ease Out Cubic/Quart)
+                let easeOut = 1 - Math.pow(1 - progress, 4);
                 let currentDrawAngle = wheelAngle + (targetAngle - wheelAngle) * easeOut;
 
                 let total = currentRoulettePool.length;
@@ -657,7 +652,9 @@
                     isSpinning = false;
                     playEffect('success');
 
-                    let winningIndex = Math.floor((2 * Math.PI - (wheelAngle % (2 * Math.PI)) + Math.PI / 2) / arcSize) % total;
+                    // المعادلة الرياضية الدقيقة لتطابق المؤشر العلوي (المثلث الأحمر عند قمة العجلة - زاوية 270 درجة)
+                    let normalizedAngle = (2 * Math.PI - (wheelAngle % (2 * Math.PI)) + (3 * Math.PI / 2)) % (2 * Math.PI);
+                    let winningIndex = Math.floor(normalizedAngle / arcSize) % total;
                     let winnerObj = currentRoulettePool[winningIndex];
 
                     document.getElementById('winnerNameText').innerText = winnerObj.name;
