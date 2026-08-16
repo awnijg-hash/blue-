@@ -64,12 +64,10 @@
         .control-group input[type="checkbox"] { width: 15px; height: 15px; accent-color: #235c36; cursor: pointer; }
         .btn-shuffle { background: #b8860b; color: #fff; border: 1px solid #8b6508; padding: 3px 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; }
         
-        /* أزرار الإضافات الجديدة تحت المدة */
         .roulette-sub-actions { display: flex; gap: 6px; width: 100%; justify-content: center; }
         .wheel-action-btn { background: #b8860b; color: #fff5cc; border: 1px solid #d4af37; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; }
         .wheel-action-btn:active { background: #8b6508; }
 
-        /* مساحة العرض السفلية */
         .roulette-viewport { width: 100%; flex: 1; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px dashed #d4af37; margin-top: 4px; touch-action: none; }
         
         .roulette-transform-container { position: absolute; display: flex; justify-content: center; align-items: center; cursor: grab; }
@@ -78,11 +76,9 @@
         canvas { border-radius: 50%; border: 4px solid #d4af37; box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); background: #fff5cc; width: 1200px; height: 1200px; }
         .roulette-pointer { position: absolute; top: -10px; width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 24px solid #ff3333; z-index: 230; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); pointer-events: none; }
         
-        /* لوحة اسم الفائز في المنتصف */
         #winner-banner { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(43, 33, 0, 0.95); border: 3px solid #d4af37; border-radius: 14px; padding: 20px 25px; z-index: 240; text-align: center; box-shadow: 0 0 30px rgba(212,175,55,0.7); max-width: 90%; animation: popIn 0.3s ease-out; }
         @keyframes popIn { from { transform: translate(-50%, -50%) scale(0.7); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
 
-        /* نافذة تأكيد الحذف / الريستارت */
         .delete-modal-box { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(43, 33, 0, 0.85); z-index: 300; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
         .delete-modal-card { background: linear-gradient(145deg, #fde48e 0%, #d4af37 100%); border: 3px solid #573f06; padding: 20px; border-radius: 12px; width: 100%; max-width: 320px; position: relative; gap: 12px; display: flex; flex-direction: column; }
     </style>
@@ -164,20 +160,17 @@
                     <button class="btn-shuffle" onclick="playEffect('click'); shuffleRouletteItems()">🔀 خلط</button>
                 </div>
 
-                <!-- الأزرار الجديدة تحت المدة -->
                 <div class="roulette-sub-actions">
                     <button class="wheel-action-btn" onclick="promptWheelReset()">🔄 إعادة تعيين</button>
                     <button class="wheel-action-btn" onclick="playEffect('click'); goToNamesScreen()">👥 الأسماء</button>
                 </div>
             </div>
 
-            <!-- مساحة العرض السفلية -->
             <div class="roulette-viewport" id="rouletteViewport">
                 <div class="roulette-transform-container" id="transformContainer">
                     <div class="roulette-pointer"></div>
                     <canvas id="wheelCanvas" width="1200" height="1200"></canvas>
                 </div>
-                <!-- لوحة اسم الفائز في المنتصف -->
                 <div id="winner-banner">
                     <div style="color: #d4af37; font-size: 14px; margin-bottom: 4px;">🎉 الفائز في المنتصف 🎉</div>
                     <div id="winnerNameText" style="color: #fff; font-size: 24px; font-weight: 900; word-break: break-word;"></div>
@@ -579,119 +572,137 @@
             for (let i = 0; i < name.length; i++) {
                 hash = name.charCodeAt(i) + ((hash << 5) - hash);
             }
-            const palette = [
-                '#FF5733', '#33FF57', '#3357FF', '#F3FF33', '#FF33F3', 
-                '#33FFF3', '#FFA533', '#A533FF', '#FF3366', '#66FF33', 
-                '#3366FF', '#FF6633', '#33FFFF', '#FF3399', '#99FF33', 
-                '#9933FF', '#FFCC33', '#33CCFF', '#FF3333', '#33FF99'
-            ];
-            let indexKey = Math.abs(hash) % palette.length;
-            return palette[indexKey];
+            let c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
+            let color = '#' + ('00000'.substring(0, 6 - c.length) + c);
+            return color;
         }
 
         function drawWheel(angle) {
-            let canvas = document.getElementById('wheelCanvas');
-            let ctx = canvas.getContext('2d');
-            let total = currentRoulettePool.length;
-            
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (total === 0) return;
+            const canvas = document.getElementById('wheelCanvas');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(centerX, centerY) - 40;
 
-            let center = canvas.width / 2;
-            let radius = center - 15;
-            let arcSize = (2 * Math.PI) / total;
+            ctx.clearRect(0, 0, width, height);
+
+            let totalItems = currentRoulettePool.length;
+            if (totalItems === 0) {
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(angle);
+                ctx.fillStyle = '#fff5cc';
+                ctx.beginPath();
+                ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.lineWidth = 10;
+                ctx.strokeStyle = '#d4af37';
+                ctx.stroke();
+                ctx.fillStyle = '#3b2c0d';
+                ctx.font = 'bold 40px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText("انتهت العناصر!", 0, 0);
+                ctx.restore();
+                return;
+            }
+
+            let sliceAngle = (2 * Math.PI) / totalItems;
 
             ctx.save();
-            ctx.translate(center, center);
+            ctx.translate(centerX, centerY);
             ctx.rotate(angle);
 
-            for (let i = 0; i < total; i++) {
-                let currentAngle = i * arcSize;
-                let item = currentRoulettePool[i];
-                let sliceColor = getParticipantColor(item.name, i);
+            for (let i = 0; i < totalItems; i++) {
+                let startAngle = i * sliceAngle;
+                let endAngle = (i + 1) * sliceAngle;
 
                 ctx.beginPath();
-                ctx.fillStyle = sliceColor;
                 ctx.moveTo(0, 0);
-                ctx.arc(0, 0, radius, currentAngle, currentAngle + arcSize);
-                ctx.lineTo(0, 0);
+                ctx.arc(0, 0, radius, startAngle, endAngle);
+                ctx.closePath();
+
+                let colors = ['#fce07d', '#dfb743', '#e6be4a', '#aa771c', '#d4af37', '#fde48e'];
+                ctx.fillStyle = colors[i % colors.length];
                 ctx.fill();
-                ctx.strokeStyle = '#2b2100';
-                ctx.lineWidth = 1;
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = '#573f06';
                 ctx.stroke();
 
-                if (total <= 500) {
-                    ctx.save();
-                    ctx.rotate(currentAngle + arcSize / 2);
-                    ctx.fillStyle = '#000000'; 
-                    let fontSize = total > 200 ? 7 : (total > 100 ? 10 : 15);
-                    ctx.font = `bold ${fontSize}px sans-serif`;
-                    let displayName = item.name.length > 8 ? item.name.substring(0, 8) + '..' : item.name;
-                    ctx.fillText(displayName, radius / 1.35, 4);
-                    ctx.restore();
-                }
+                ctx.save();
+                ctx.rotate(startAngle + sliceAngle / 2);
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = '#2b2100';
+                
+                let fontSize = Math.max(16, Math.min(40, Math.floor(400 / totalItems)));
+                ctx.font = `bold ${fontSize}px Segoe UI`;
+
+                let text = currentRoulettePool[i].name;
+                if (text.length > 15) text = text.substring(0, 15) + '...';
+                ctx.fillText(text, radius - 45, 0);
+                ctx.restore();
             }
+
+            ctx.beginPath();
+            ctx.arc(0, 0, 60, 0, 2 * Math.PI);
+            ctx.fillStyle = '#2b2100';
+            ctx.fill();
+            ctx.lineWidth = 6;
+            ctx.strokeStyle = '#d4af37';
+            ctx.stroke();
+
             ctx.restore();
         }
 
         function spinWheel() {
-            if (isSpinning) return;
-            if (currentRoulettePool.length === 0) {
-                alert("انتهت جميع العناصر!");
-                return;
-            }
-
+            if (isSpinning || currentRoulettePool.length === 0) return;
+            isSpinning = true;
             document.getElementById('winner-banner').style.display = 'none';
 
-            isSpinning = true;
-            let durationSeconds = parseInt(document.getElementById('spinDurationRange').value) || 5;
-            let duration = durationSeconds * 1000;
+            let duration = parseInt(document.getElementById('spinDurationRange').value) * 1000;
+            let totalItems = currentRoulettePool.length;
+            let sliceAngle = (2 * Math.PI) / totalItems;
 
-            let randomSpins = 6 + durationSeconds * 2; 
-            let targetAngle = wheelAngle + (randomSpins * 2 * Math.PI) + Math.random() * (2 * Math.PI);
+            let winningIndex = Math.floor(Math.random() * totalItems);
+            let extraSpins = 5 + Math.floor(Math.random() * 5);
+            
+            let targetAngle = (2 * Math.PI * extraSpins) + (3 * Math.PI / 2) - (winningIndex * sliceAngle) - (sliceAngle / 2);
+
             let startTime = null;
-            let lastTickAngle = 0;
+            let startAngle = wheelAngle;
 
             function animateSpin(currentTime) {
                 if (!startTime) startTime = currentTime;
                 let elapsed = currentTime - startTime;
                 let progress = Math.min(elapsed / duration, 1);
                 
-                let easeOut = 1 - Math.pow(1 - progress, 4);
-                let currentDrawAngle = wheelAngle + (targetAngle - wheelAngle) * easeOut;
+                let easeOut = 1 - Math.pow(1 - progress, 3);
+                wheelAngle = startAngle + (targetAngle - startAngle) * easeOut;
 
-                let total = currentRoulettePool.length;
-                let arcSize = (2 * Math.PI) / total;
-                if (Math.abs(currentDrawAngle - lastTickAngle) >= arcSize) {
-                    playEffect('tick');
-                    lastTickAngle = currentDrawAngle;
-                }
-
-                drawWheel(currentDrawAngle);
+                drawWheel(wheelAngle);
 
                 if (progress < 1) {
                     requestAnimationFrame(animateSpin);
                 } else {
-                    wheelAngle = targetAngle % (2 * Math.PI);
                     isSpinning = false;
+                    wheelAngle = targetAngle % (2 * Math.PI);
+                    
+                    let winner = currentRoulettePool[winningIndex].name;
                     playEffect('success');
+                    
+                    let banner = document.getElementById('winner-banner');
+                    document.getElementById('winnerNameText').innerText = winner;
+                    banner.style.display = 'block';
 
-                    let normalizedAngle = (2 * Math.PI - (wheelAngle % (2 * Math.PI)) + (3 * Math.PI / 2)) % (2 * Math.PI);
-                    let winningIndex = Math.floor(normalizedAngle / arcSize) % total;
-                    let winnerObj = currentRoulettePool[winningIndex];
-
-                    document.getElementById('winnerNameText').innerText = winnerObj.name;
-                    document.getElementById('winner-banner').style.display = 'block';
-
-                    let shouldRemove = document.getElementById('removeWinnerCheck').checked;
-                    if (shouldRemove) {
+                    if (document.getElementById('removeWinnerCheck').checked) {
                         currentRoulettePool.splice(winningIndex, 1);
-                        setTimeout(() => {
-                            drawWheel(wheelAngle);
-                        }, 400);
                     }
                 }
             }
+
             requestAnimationFrame(animateSpin);
         }
     </script>
