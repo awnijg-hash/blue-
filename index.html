@@ -1,91 +1,146 @@
-<script>
-        // ... (نفس الدوال السابقة الخاصة بالصوت والبيانات) ...
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>منصة الإضافات التفاعلية</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #2b2100; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .mobile-frame { width: 100%; max-width: 430px; height: 100vh; max-height: 900px; background: #d4af37; display: flex; flex-direction: column; position: relative; overflow: hidden; border: 2px solid #573f06; }
+        #home-screen { flex: 1; background: linear-gradient(145deg, #fde48e 0%, #e6be4ae0 100%); display: flex; flex-direction: column; padding: 20px; overflow-y: auto; }
+        .screen-header { font-size: 24px; font-weight: bold; text-align: center; color: #3b2c0d; margin-bottom: 20px; }
+        .btn-main { background: #fff3c4; color: #3b2c0d; font-weight: bold; padding: 14px; border-radius: 8px; border: 2px solid #7c5d12; font-size: 18px; cursor: pointer; text-align: center; margin-bottom: 15px; }
+        .add-box { background: #fce89c; border: 2px solid #7c5d12; border-radius: 8px; padding: 12px; margin-bottom: 15px; display: none; flex-direction: column; gap: 8px; }
+        .add-box input { width: 100%; padding: 10px; border-radius: 6px; border: 2px solid #7c5d12; background: #fff5cc; font-size: 16px; font-weight: bold; }
+        .list-item { background: #fff5cc; border: 2px solid #7c5d12; border-radius: 8px; padding: 15px; font-size: 20px; font-weight: bold; text-align: center; cursor: pointer; color: #3b2c0d; margin-bottom: 10px; position: relative; }
+        .delete-btn { position: absolute; top: 6px; left: 8px; background: #a83232; color: #fff; border-radius: 50%; width: 26px; height: 26px; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        
+        #details-screen { display: none; flex: 1; background: #fde48e; flex-direction: column; padding: 12px; }
+        .participants-scroll { flex: 1; overflow-y: auto; gap: 10px; display: flex; flex-direction: column; }
+        .participant-card-mobile { border-radius: 8px; padding: 10px; color: #ffffff; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        
+        #roulette-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #2b2100; z-index: 200; flex-direction: column; padding: 10px; }
+        .roulette-viewport { flex: 1; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        canvas { width: 100%; max-width: 400px; height: 400px; }
+        .roulette-pointer { position: absolute; top: 10px; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid #ff3333; z-index: 230; }
+        #winner-banner { display: none; position: absolute; top: 50px; width: 90%; background: rgba(0,0,0,0.8); color: #ffeb3b; padding: 15px; border-radius: 10px; text-align: center; z-index: 250; font-size: 24px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="mobile-frame">
+        <div id="home-screen">
+            <div class="screen-header">القائمة الرئيسية</div>
+            <button class="btn-main" onclick="toggleAddBox('add-main-container')">+ إضافة جديد</button>
+            <div id="add-main-container" class="add-box">
+                <input type="text" id="new-item-name" placeholder="اكتب الاسم هنا...">
+                <button class="btn-main" onclick="addNewItem()">حفظ</button>
+            </div>
+            <div id="list-container"></div>
+        </div>
 
-        // تحديث دالة رسم العجلة (إزالة الإطار الأبيض)
+        <div id="details-screen">
+            <button class="btn-main" onclick="startRoulette()">🎡 روليت العجلة</button>
+            <div class="participants-scroll" id="sub-list-container"></div>
+            <button class="btn-main" onclick="goBackHome()">رجوع</button>
+        </div>
+
+        <div id="roulette-modal">
+            <div class="roulette-pointer"></div>
+            <div id="winner-banner"></div>
+            <div class="roulette-viewport">
+                <canvas id="wheelCanvas" width="800" height="800"></canvas>
+            </div>
+            <input type="range" id="spinDurationRange" min="1" max="10" value="3" style="width:100%">
+            <button class="btn-main" onclick="spinWheel()">دوران</button>
+            <button class="btn-main" onclick="closeRouletteModal()">إغلاق</button>
+        </div>
+    </div>
+
+    <script>
+        let appData = JSON.parse(localStorage.getItem('pureAppData')) || { items: {} };
+        let currentOpen = "";
+        let wheelAngle = 0;
+        let isSpinning = false;
+        let currentRoulettePool = [];
+
+        function toggleAddBox(id) { document.getElementById(id).style.display = document.getElementById(id).style.display === 'flex' ? 'none' : 'flex'; }
+        
+        function addNewItem() {
+            let name = document.getElementById('new-item-name').value.trim();
+            if (name) { appData.items[name] = []; localStorage.setItem('pureAppData', JSON.stringify(appData)); renderList(); }
+        }
+
+        function renderList() {
+            let container = document.getElementById('list-container'); container.innerHTML = "";
+            Object.keys(appData.items).forEach(name => {
+                let div = document.createElement('div'); div.className = 'list-item';
+                div.innerHTML = name; div.onclick = () => openDetails(name); container.appendChild(div);
+            });
+        }
+
+        function openDetails(name) {
+            currentOpen = name;
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('details-screen').style.display = 'flex';
+        }
+
+        function goBackHome() { document.getElementById('details-screen').style.display = 'none'; document.getElementById('home-screen').style.display = 'flex'; }
+
         function drawWheel(angle) {
             const canvas = document.getElementById('wheelCanvas');
             const ctx = canvas.getContext('2d');
-            const width = canvas.width;
-            const height = canvas.height;
-            const centerX = width / 2;
-            const centerY = height / 2;
-            const radius = Math.min(centerX, centerY) - 30;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 350;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let arcSize = (2 * Math.PI) / currentRoulettePool.length;
 
-            ctx.clearRect(0, 0, width, height);
-
-            let totalSlices = currentRoulettePool.length;
-            if (totalSlices === 0) return;
-
-            let arcSize = (2 * Math.PI) / totalSlices;
-
-            ctx.save();
-            ctx.translate(centerX, centerY);
-            ctx.rotate(angle);
-
-            for (let i = 0; i < totalSlices; i++) {
-                let startAngle = i * arcSize;
-                let endAngle = (i + 1) * arcSize;
-
+            currentRoulettePool.forEach((item, i) => {
                 ctx.beginPath();
-                ctx.moveTo(0, 0);
-                ctx.arc(0, 0, radius, startAngle, endAngle);
-                ctx.closePath();
-
-                ctx.fillStyle = currentRoulettePool[i].color;
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, i * arcSize + angle, (i + 1) * arcSize + angle);
+                ctx.fillStyle = item.color;
                 ctx.fill();
-                // تم إزالة ctx.stroke(); الذي كان يرسم الحد الأبيض حول العجلة
-            }
-
-            ctx.restore();
-
-            // الدائرة المركزية
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, 40, 0, 2 * Math.PI);
-            ctx.fillStyle = "#d4af37";
-            ctx.fill();
-            ctx.lineWidth = 4;
-            ctx.strokeStyle = "#573f06";
-            ctx.stroke();
+                // تم حذف stroke() لإزالة الحد الأبيض
+            });
         }
 
-        // تحديث دالة تدوير العجلة (التزامن الدقيق مع الوقت)
         function spinWheel() {
-            if (isSpinning || currentRoulettePool.length === 0) return;
+            if (isSpinning) return;
             isSpinning = true;
-            playEffect('start');
-            document.getElementById('winner-banner').style.display = 'none';
-
             let duration = parseFloat(document.getElementById('spinDurationRange').value) * 1000;
-            // جعل سرعة اللف ديناميكية حسب المدة المختارة
-            let extraRotations = 5 + Math.floor(Math.random() * 3); 
-            let randomAngle = Math.random() * 2 * Math.PI;
-            let targetAngle = wheelAngle + (extraRotations * 2 * Math.PI) + randomAngle;
-
+            let targetAngle = wheelAngle + (Math.random() * 10 + 5) * Math.PI * 2;
             let startTime = null;
 
-            function animateSpin(currentTime) {
+            function animate(currentTime) {
                 if (!startTime) startTime = currentTime;
-                let elapsed = currentTime - startTime;
-                let progress = Math.min(elapsed / duration, 1);
-                
-                // دالة التباطؤ (Ease Out)
+                let progress = Math.min((currentTime - startTime) / duration, 1);
                 let easeProgress = 1 - Math.pow(1 - progress, 3);
-                
-                // تحديث الزاوية بناءً على الوقت المنقضي
                 wheelAngle = (targetAngle * easeProgress) % (2 * Math.PI);
                 drawWheel(wheelAngle);
-
-                if (progress < 1) {
-                    requestAnimationFrame(animateSpin);
-                } else {
-                    // هنا ينتهي الوقت بالضبط
-                    isSpinning = false;
-                    determineWinner();
-                }
+                if (progress < 1) requestAnimationFrame(animate);
+                else { isSpinning = false; determineWinner(); }
             }
-
-            requestAnimationFrame(animateSpin);
+            requestAnimationFrame(animate);
         }
 
-        // ... (باقي الدوال تبقى كما هي) ...
+        function determineWinner() {
+            let total = currentRoulettePool.length;
+            let index = Math.floor(((((-wheelAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) / (2 * Math.PI)) * total);
+            document.getElementById('winner-banner').innerText = "الفائز هو: " + currentRoulettePool[index].name;
+            document.getElementById('winner-banner').style.display = 'block';
+        }
+
+        function startRoulette() {
+            currentRoulettePool = [{name: "أحمد", color: "red"}, {name: "محمد", color: "blue"}]; // مثال
+            document.getElementById('roulette-modal').style.display = 'flex';
+            drawWheel(0);
+        }
+
+        function closeRouletteModal() { document.getElementById('roulette-modal').style.display = 'none'; }
+        
+        renderList();
     </script>
+</body>
+</html>
