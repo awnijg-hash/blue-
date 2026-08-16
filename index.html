@@ -64,7 +64,7 @@
         .control-group input[type="checkbox"] { width: 15px; height: 15px; accent-color: #235c36; cursor: pointer; }
         .btn-shuffle { background: #b8860b; color: #fff; border: 1px solid #8b6508; padding: 2px 6px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; }
 
-        /* مساحة العرض السفلية الحرة (Pan, Zoom & Mouse Wheel Viewport) */
+        /* مساحة العرض السفلية الحرة */
         .roulette-viewport { width: 100%; flex: 1; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px dashed #d4af37; margin-top: 4px; touch-action: none; }
         
         .roulette-transform-container { position: absolute; display: flex; justify-content: center; align-items: center; cursor: grab; }
@@ -148,7 +148,7 @@
                 
                 <div class="roulette-controls">
                     <div class="control-group">
-                        <span>الحجم (أو عجلة الماوس):</span>
+                        <span>الحجم:</span>
                         <input type="range" id="wheelZoomRange" min="0.3" max="4.0" step="0.1" value="1" oninput="updateWheelZoom(this.value)">
                     </div>
                     <div class="control-group">
@@ -164,13 +164,13 @@
                 </div>
             </div>
 
-            <!-- مساحة العرض السفلية مع دعم عجلة الفأرة للتكبير والتصغير الحر -->
+            <!-- مساحة العرض السفلية -->
             <div class="roulette-viewport" id="rouletteViewport">
                 <div class="roulette-transform-container" id="transformContainer">
                     <div class="roulette-pointer"></div>
                     <canvas id="wheelCanvas" width="1200" height="1200"></canvas>
                 </div>
-                <!-- لوحة اسم الفائز في وسط الشاشة مباشرة وتبقى ظاهرة حتى تدور مجدداً -->
+                <!-- لوحة اسم الفائز في وسط الشاشة مباشرة -->
                 <div id="winner-banner">
                     <div style="color: #d4af37; font-size: 14px; margin-bottom: 4px;">🎉 الفائز في المنتصف 🎉</div>
                     <div id="winnerNameText" style="color: #fff; font-size: 24px; font-weight: 900; word-break: break-word;"></div>
@@ -472,9 +472,10 @@
             let list = appData.items[currentOpen];
             if (!list || list.length === 0) return;
             
+            // مطابقة تامة لعدد الاشتراكات والأسماء المسجلة
             currentRoulettePool = [];
             list.forEach(item => {
-                for(let i=0; i<item.val; i++) {
+                for(let i = 0; i < item.val; i++) {
                     currentRoulettePool.push(item.name);
                 }
             });
@@ -509,7 +510,6 @@
             container.style.transform = `translate(${panX}px, ${panY}px) scale(${currentZoom})`;
         }
 
-        // دعم تحريك العجلة بالسحب بالأصابع أو الماوس
         let isDragging = false;
         let startX, startY;
         const viewport = document.getElementById('rouletteViewport');
@@ -533,14 +533,13 @@
             viewport.releasePointerCapture(e.pointerId);
         });
 
-        // دعم التكبير والتصغير الحر بواسطة عجلة الماوس (Mouse Wheel Zoom)
         viewport.addEventListener('wheel', (e) => {
             e.preventDefault();
             playEffect('step');
             if (e.deltaY < 0) {
-                currentZoom = Math.min(currentZoom + 0.15, 4.0); // تقريب وتكبير
+                currentZoom = Math.min(currentZoom + 0.15, 4.0);
             } else {
-                currentZoom = Math.max(currentZoom - 0.15, 0.3); // إبعاد وتصغير
+                currentZoom = Math.max(currentZoom - 0.15, 0.3);
             }
             updateWheelZoom(currentZoom);
         }, { passive: false });
@@ -579,12 +578,11 @@
                 ctx.fill();
                 ctx.stroke();
 
-                // التعامل مع عدد الأسماء الضخم ورسمها بوضوح
-                if (total <= 350) {
+                if (total <= 500) {
                     ctx.save();
                     ctx.rotate(currentAngle + arcSize / 2);
                     ctx.fillStyle = '#2b2100';
-                    let fontSize = total > 180 ? 8 : (total > 90 ? 11 : 16);
+                    let fontSize = total > 200 ? 7 : (total > 100 ? 10 : 15);
                     ctx.font = `bold ${fontSize}px sans-serif`;
                     let displayName = currentRoulettePool[i].length > 8 ? currentRoulettePool[i].substring(0, 8) + '..' : currentRoulettePool[i];
                     ctx.fillText(displayName, radius / 1.35, 4);
@@ -601,7 +599,6 @@
                 return;
             }
 
-            // إخفاء نافذة الفائز القديمة فوراً عند الضغط لتدوير الشاشة من جديد
             document.getElementById('winner-banner').style.display = 'none';
 
             isSpinning = true;
@@ -640,7 +637,6 @@
                     let winningIndex = Math.floor((2 * Math.PI - (wheelAngle % (2 * Math.PI)) + Math.PI / 2) / arcSize) % total;
                     let winnerName = currentRoulettePool[winningIndex];
 
-                    // إظهار اسم الفائز في وسط الشاشة مباشرة ويبقى ثابتاً لا ينغلق إلا عند الدوران مجدداً
                     document.getElementById('winnerNameText').innerText = winnerName;
                     document.getElementById('winner-banner').style.display = 'block';
 
