@@ -57,9 +57,20 @@
         
         .roulette-header-fixed { width: 100%; display: flex; flex-direction: column; gap: 4px; z-index: 220; flex-shrink: 0; margin-top: 5px; }
         
-        /* مكان الفريق الفائز في أعلى الإطار تحت الأزرار بخط كبير */
-        #winner-banner { display: none; width: 100%; background: rgba(43, 33, 0, 0.95); border: 2px solid #d4af37; border-radius: 8px; padding: 6px; text-align: center; box-shadow: 0 0 15px rgba(212,175,55,0.6); animation: popIn 0.2s ease-out; }
-        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        /* خانة الفريق الفائز بلون المشارك مع وهج ناري وسيع */
+        #winner-banner { display: none; width: 100%; border: 3px solid #fff; border-radius: 10px; padding: 8px; text-align: center; box-shadow: 0 0 25px #ffcc00, inset 0 0 15px rgba(255,255,255,0.5); animation: glowPulse 0.4s ease-in-out infinite alternate; position: relative; }
+        @keyframes glowPulse {
+            from { box-shadow: 0 0 10px #ffcc00, 0 0 20px #ff9900; }
+            to { box-shadow: 0 0 30px #ffffff, 0 0 50px #ff3300; }
+        }
+
+        /* إشارة X الحمراء الكبيرة عند الخروج النهائي */
+        #elimination-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); border-radius: 8px; justify-content: center; align-items: center; z-index: 250; pointer-events: none; }
+        .big-red-x { font-size: 65px; font-weight: 900; color: #ff0000; text-shadow: 0 0 10px #000, 0 0 20px #ff0000; line-height: 1; transform: rotate(-10deg); animation: xPulse 0.3s ease-in-out infinite alternate; }
+        @keyframes xPulse {
+            from { transform: scale(1) rotate(-10deg); }
+            to { transform: scale(1.1) rotate(-10deg); }
+        }
 
         .roulette-controls { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid #d4af37; border-radius: 8px; padding: 5px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 4px; text-align: right; }
         .control-group { display: flex; align-items: center; gap: 4px; color: #fff5cc; font-size: 11px; font-weight: bold; }
@@ -78,7 +89,6 @@
 
         canvas { border-radius: 50%; box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); background: #fff5cc; width: 1200px; height: 1200px; }
         
-        /* مؤشر العجلة ثابت في وسط أعلى العجلة ومتحرك معها تماماً */
         .roulette-pointer-container { position: absolute; top: -2px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 230; pointer-events: none; }
         .roulette-pointer { width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 26px solid #ff3333; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.7)); }
 
@@ -148,12 +158,14 @@
             <button class="close-x-btn" onclick="playEffect('click'); closeRouletteModal()">×</button>
             
             <div class="roulette-header-fixed">
-                <div style="color: #fce07d; font-size: 13px; font-weight: bold;">عجلة الحظ التفاعلية</div>
+                <div style="color: #fce07d; font-size: 12px; font-weight: bold;">عجلة الحظ التفاعلية</div>
                 
-                <!-- مكان الفريق الفائز في أعلى الإطار تحت الأزرار مباشرة بخط كبير -->
+                <!-- مكان الفريق الفائز مع عرض الاشتراكات المتبقية وإشارة X عند الخروج النهائي -->
                 <div id="winner-banner">
-                    <div style="color: #d4af37; font-size: 11px; margin-bottom: 1px;">🎉 الفريق الفائز 🎉</div>
-                    <div id="winnerNameText" style="color: #fff; font-size: 22px; font-weight: 900; word-break: break-word;"></div>
+                    <div id="elimination-overlay"><div class="big-red-x">❌</div></div>
+                    <div id="winnerTitleText" style="font-size: 11px; margin-bottom: 1px; font-weight: bold;">🎉 الفائز 🎉</div>
+                    <div id="winnerNameText" style="font-size: 24px; font-weight: 900; word-break: break-word;"></div>
+                    <div id="winnerRemainingText" style="font-size: 13px; font-weight: bold; margin-top: 2px; background: rgba(0,0,0,0.2); display: inline-block; padding: 2px 8px; border-radius: 4px;"></div>
                 </div>
 
                 <div class="roulette-controls">
@@ -178,7 +190,6 @@
             <div class="roulette-viewport" id="rouletteViewport">
                 <div class="roulette-transform-container" id="transformContainer">
                     <canvas id="wheelCanvas" width="1200" height="1200"></canvas>
-                    <!-- المؤشر الأحمر في وسط أعلى العجلة ومتحرك معها تماماً -->
                     <div class="roulette-pointer-container">
                         <div class="roulette-pointer"></div>
                     </div>
@@ -223,11 +234,28 @@
                 gain.gain.setValueAtTime(0.25, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
                 osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.08);
             } else if (type === 'tick') {
-                // مؤثر صوتي خاص بنقرات دوران العجلة
                 let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
                 osc.type = 'sine'; osc.frequency.setValueAtTime(1200, now);
                 gain.gain.setValueAtTime(0.08, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
                 osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.02);
+            } else if (type === 'surprised') {
+                let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.25);
+                osc.frequency.exponentialRampToValueAtTime(400, now + 0.45);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+                osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.45);
+            } else if (type === 'fail') {
+                // صوت فشل وانخفاض عند خروج المشارك نهائياً
+                let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.exponentialRampToValueAtTime(80, now + 0.5);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.5);
             } else if (type === 'success') {
                 [523.25, 659.25, 783.99, 1046.50].forEach((freq, index) => {
                     let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
@@ -333,7 +361,6 @@
         function executeModalAction() {
             if (isWheelResetAction) {
                 playEffect('success');
-                // استعادة الاشتراكات الأصلية للقائمة الحالية
                 resetOriginalList();
                 initRoulettePool();
                 document.getElementById('winner-banner').style.display = 'none';
@@ -352,7 +379,6 @@
             closeDeleteModal();
         }
 
-        // دالة لإعادة تعيين البيانات الأصلية للقائمة الحالية (تخزين مؤقت للنسخة الأصلية للرجوع لها عند إعادة التعيين)
         let originalListBackup = null;
         function backupOriginalList() {
             let list = appData.items[currentOpen] || [];
@@ -729,7 +755,6 @@
                 let easeOut = 1 - Math.pow(1 - progress, 3);
                 wheelAngle = startAngle + (targetAngle - startAngle) * easeOut;
 
-                // تشغيل صوت التك أثناء الدوران عند اجتياز قطاع جديد
                 if (Math.abs(wheelAngle - lastTickAngle) >= sliceAngle * 0.8) {
                     playEffect('tick');
                     lastTickAngle = wheelAngle;
@@ -743,23 +768,37 @@
                     isSpinning = false;
                     wheelAngle = targetAngle % (2 * Math.PI);
                     
-                    let winner = currentRoulettePool[winningIndex].name;
-                    playEffect('success');
+                    let winnerObj = currentRoulettePool[winningIndex];
+                    let winner = winnerObj.name;
+                    let winnerColor = winnerObj.color;
                     
                     let banner = document.getElementById('winner-banner');
-                    document.getElementById('winnerNameText').innerText = winner;
-                    banner.style.display = 'block';
+                    banner.style.backgroundColor = winnerColor;
+                    
+                    let r = parseInt(winnerColor.substr(1,2),16);
+                    let g = parseInt(winnerColor.substr(3,2),16);
+                    let b = parseInt(winnerColor.substr(5,2),16);
+                    let yiq = ((r*299)+(g*587)+(b*114))/1000;
+                    let textColor = (yiq >= 128) ? '#2c2200' : '#ffffff';
+
+                    document.getElementById('winnerTitleText').style.color = textColor;
+                    let nameTextElem = document.getElementById('winnerNameText');
+                    nameTextElem.innerText = winner;
+                    nameTextElem.style.color = textColor;
+
+                    let remainingShares = 0;
+                    let isTotallyOut = false;
 
                     if (document.getElementById('removeWinnerCheck').checked) {
-                        let removedWinnerName = currentRoulettePool[winningIndex].name;
                         currentRoulettePool.splice(winningIndex, 1);
                         
-                        // خصم الفائز من القائمة الرئيسية للمشتركين ليتم مزامنتها تلقائياً
                         let subList = appData.items[currentOpen];
                         for (let k = 0; k < subList.length; k++) {
-                            if (subList[k].name === removedWinnerName) {
+                            if (subList[k].name === winner) {
                                 subList[k].val -= 1;
+                                remainingShares = subList[k].val;
                                 if (subList[k].val <= 0) {
+                                    isTotallyOut = true;
                                     subList.splice(k, 1);
                                 }
                                 save();
@@ -767,7 +806,32 @@
                                 break;
                             }
                         }
+                    } else {
+                        let subList = appData.items[currentOpen];
+                        for (let k = 0; k < subList.length; k++) {
+                            if (subList[k].name === winner) {
+                                remainingShares = subList[k].val;
+                                break;
+                            }
+                        }
                     }
+
+                    let remainingElem = document.getElementById('winnerRemainingText');
+                    let eliminationOverlay = document.getElementById('elimination-overlay');
+
+                    if (isTotallyOut) {
+                        playEffect('fail');
+                        remainingElem.innerText = `الاشتراكات المتبقية: 0 (خروج نهائي)`;
+                        remainingElem.style.color = '#ff3333';
+                        eliminationOverlay.style.display = 'flex';
+                    } else {
+                        playEffect('surprised');
+                        remainingElem.innerText = `الاشتراكات المتبقية: ${remainingShares}`;
+                        remainingElem.style.color = textColor;
+                        eliminationOverlay.style.display = 'none';
+                    }
+                    
+                    banner.style.display = 'block';
                 }
             }
 
